@@ -3,7 +3,17 @@ package com.radeusgd.trachonline
 import com.benasher44.uuid.Uuid
 import com.radeusgd.trachonline.board.GameSnapshot
 import com.radeusgd.trachonline.board.Player
-import com.radeusgd.trachonline.messages.*
+import com.radeusgd.trachonline.gamearea.GameArea
+import com.radeusgd.trachonline.gamedefinition.GameDefinition
+import com.radeusgd.trachonline.messages.ChatMessage
+import com.radeusgd.trachonline.messages.ClientMessage
+import com.radeusgd.trachonline.messages.Exited
+import com.radeusgd.trachonline.messages.Joined
+import com.radeusgd.trachonline.messages.LogMessage
+import com.radeusgd.trachonline.messages.MoveEntity
+import com.radeusgd.trachonline.messages.SendChatMessage
+import com.radeusgd.trachonline.messages.SetNickName
+import com.radeusgd.trachonline.messages.UpdateGameState
 import java.util.concurrent.atomic.AtomicInteger
 
 data class GameClient(var nickName: String)
@@ -57,7 +67,6 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         data.nickName = message.newNickname
         log("Player $oldNickName is now called ${message.newNickname}.")
     }
-
 
     private val players = HashMap<Uuid, GameClient>()
 

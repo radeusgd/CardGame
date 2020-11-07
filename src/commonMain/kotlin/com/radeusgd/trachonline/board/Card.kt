@@ -6,7 +6,7 @@ import com.radeusgd.trachonline.util.UuidSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Position(val x: Int, val y: Int, val depth: Int)
+data class Position(val x: Float, val y: Float, val depth: Int)
 
 @Serializable
 data class CardVisuals(val frontImage: String, val backImage: String)
@@ -22,7 +22,9 @@ data class Card(
     override val uuid: Uuid,
     val visuals: CardVisuals,
     val isShowingFront: Boolean
-) : BoardEntity()
+) : BoardEntity() {
+    fun getCurrentImage(): String = if (isShowingFront) visuals.frontImage else visuals.backImage
+}
 
 @Serializable
 data class CardStack(

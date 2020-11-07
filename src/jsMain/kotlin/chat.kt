@@ -51,7 +51,7 @@ class Chat(props: ChatProps) : RComponent<ChatProps, ChatState>(props) {
 
                 styledInput {
                     css {
-                        +GameStyles.textInput
+                        +GameStyles.input
                     }
                     attrs {
                         type = InputType.text
@@ -71,7 +71,7 @@ class Chat(props: ChatProps) : RComponent<ChatProps, ChatState>(props) {
 
                 styledInput {
                     css {
-                        +GameStyles.buttonInput
+                        +GameStyles.input
                     }
                     attrs {
                         type = InputType.button
@@ -82,7 +82,7 @@ class Chat(props: ChatProps) : RComponent<ChatProps, ChatState>(props) {
 
                 styledInput {
                     css {
-                        +GameStyles.buttonInput
+                        +GameStyles.input
                     }
                     attrs {
                         type = InputType.button

@@ -1,5 +1,9 @@
 import com.radeusgd.trachonline.board.GameSnapshot
-import com.radeusgd.trachonline.messages.*
+import com.radeusgd.trachonline.messages.ChatMessage
+import com.radeusgd.trachonline.messages.Error
+import com.radeusgd.trachonline.messages.LogMessage
+import com.radeusgd.trachonline.messages.ServerMessage
+import com.radeusgd.trachonline.messages.UpdateGameState
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.MessageEvent

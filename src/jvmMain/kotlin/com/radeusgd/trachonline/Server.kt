@@ -4,7 +4,7 @@ import com.radeusgd.trachonline.messages.ClientMessage
 import com.radeusgd.trachonline.messages.Exited
 import com.radeusgd.trachonline.messages.Joined
 import com.radeusgd.trachonline.messages.ServerMessage
-import java.util.*
+import java.util.UUID
 
 abstract class Server<ClientData> {
     private val clients = java.util.concurrent.ConcurrentHashMap<UUID, Pair<Client, ClientData>>()

@@ -1,0 +1,22 @@
+{
+  "decks": [
+    {
+      "basePath": "trach-cards",
+      "backName": "super_trach.jpg",
+      "cards": [
+        {
+          "name": "atak.jpg",
+          "count": 7
+        },
+        {
+          "name": "obrona.jpg",
+          "count": 5
+        },
+        {
+          "name": "wzmocnienie.jpg",
+          "count": 3
+        }
+      ]
+    }
+  ]
+}

@@ -100,7 +100,10 @@ tasks.getByName<Jar>("jvmJar") {
     val jsBrowserProductionWebpack = tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack")
     from(
         File(jsBrowserProductionWebpack.destinationDirectory, jsBrowserProductionWebpack.outputFileName),
-        File(jsBrowserProductionWebpack.destinationDirectory, "output.js.map") // TODO this is slightly ugly but we are in hurry
+        File(
+            jsBrowserProductionWebpack.destinationDirectory,
+            "output.js.map"
+        ) // TODO this is slightly ugly but we are in hurry
     )
 }
 tasks.getByName<JavaExec>("run") {

@@ -34,3 +34,5 @@ hs_err_pid*
 build/
 gradle.properties
 gradle/
+
+src/jvmMain/resources/trach-cards
