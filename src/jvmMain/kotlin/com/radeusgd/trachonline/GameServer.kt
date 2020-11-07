@@ -48,6 +48,7 @@ class GameServer : Server<GameClient>() {
     fun Client.nickName(): String = getClientData(this).nickName
 
     fun log(message: String) {
+        System.out.println(message)
         broadcast(LogMessage(message))
     }
 }

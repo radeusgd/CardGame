@@ -63,6 +63,7 @@ kotlin {
                 implementation("io.ktor:ktor-websockets:1.4.0")
                 implementation("io.ktor:ktor-html-builder:1.4.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
+                implementation("org.slf4j:slf4j-simple:1.7.30")
             }
         }
         val jvmTest by getting {
@@ -86,7 +87,7 @@ kotlin {
     }
 }
 application {
-    mainClassName = "ServerKt"
+    mainClassName = "com.radeusgd.trachonline.ServerKt"
 }
 tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
     outputFileName = "output.js"

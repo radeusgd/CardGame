@@ -14,4 +14,10 @@ object WelcomeStyles : StyleSheet("WelcomeStyles", isStatic = true) {
 
         fontSize = 14.px
     }
+
+    val buttonInput by css {
+        margin(vertical = 5.px)
+
+        fontSize = 14.px
+    }
 } 

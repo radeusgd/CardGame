@@ -1,7 +1,7 @@
 package com.radeusgd.trachonline
 
+import io.ktor.application.*
 import messages.Message
-import io.ktor.application.call
 import io.ktor.html.respondHtml
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.*
@@ -38,6 +38,7 @@ fun HTML.index() {
 fun main() {
     val server = GameServer()
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
+        install(WebSockets)
         routing {
             get("/") {
                 call.respondHtml(HttpStatusCode.OK, HTML::index)

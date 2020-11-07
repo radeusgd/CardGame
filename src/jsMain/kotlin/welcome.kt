@@ -1,5 +1,8 @@
 import kotlinx.html.InputType
 import kotlinx.html.js.onChangeFunction
+import kotlinx.html.js.onClickFunction
+import kotlinx.html.onClick
+import messages.SetNickName
 import org.w3c.dom.HTMLInputElement
 import react.RBuilder
 import react.RComponent
@@ -38,8 +41,20 @@ class Welcome(props: WelcomeProps) : RComponent<WelcomeProps, WelcomeState>(prop
                 value = state.name
                 onChangeFunction = { event ->
                     setState(
-                            WelcomeState(name = (event.target as HTMLInputElement).value)
+                        WelcomeState(name = (event.target as HTMLInputElement).value)
                     )
+                }
+            }
+        }
+        styledInput {
+            css {
+                +WelcomeStyles.buttonInput
+            }
+            attrs {
+                type = InputType.button
+                value = "Set nickname"
+                onClickFunction = { event ->
+                    sendMessage(SetNickName(state.name))
                 }
             }
         }

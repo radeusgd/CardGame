@@ -13,8 +13,8 @@ abstract class Server<ClientData> {
         }
 
      fun onJoined(client: Client) = client.run {
-         onMessage(this, Joined)
          initializeClientData(this).let { clientData -> clients.put(uuid(), Pair(this, clientData)) }
+         onMessage(this, Joined)
      }
 
     fun onExited(client: Client) = client.run {
