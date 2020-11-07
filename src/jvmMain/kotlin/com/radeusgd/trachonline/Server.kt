@@ -13,21 +13,33 @@ abstract class Server<ClientData> {
             client.sendMessage(message)
         }
 
-     fun onJoined(client: Client) = client.run {
-         initializeClientData(this).let { clientData -> clients.put(uuid(), Pair(this, clientData)) }
-         onMessage(this, Joined)
-     }
+    fun connectedClients(): List<Client> = clients.map { it.value.first }
+
+    fun onJoined(client: Client) = client.run {
+        initializeClientData(this).let { clientData -> clients.put(uuid(), Pair(this, clientData)) }
+        onMessage(this, Joined)
+    }
 
     fun onExited(client: Client) = client.run {
         onMessage(this, Exited)
         clients.remove(uuid())
     }
 
+    private val lock = object {}
+    fun onMessage(client: Client, message: ClientMessage) {
+        synchronized(lock) {
+            handleMessage(client, message)
+        }
+    }
+
     fun getClientData(client: Client) =
         getClientData(client.uuid()) ?: throw IllegalStateException("A client was passed that is no longer connected")
 
-    private fun getClientData(uuid: UUID): ClientData? = clients[uuid]?.second
+    fun getClientData(uuid: UUID): ClientData? = clients[uuid]?.second
 
     abstract fun initializeClientData(client: Client): ClientData
-    abstract fun onMessage(client: Client, message: ClientMessage)
+
+    /** Handle message calls are synchronized - they will be called one after another,
+     * but they should not do any blocking operations. */
+    abstract fun handleMessage(client: Client, message: ClientMessage)
 }

@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 plugins {
     kotlin("multiplatform") version "1.4.10"
     kotlin("plugin.serialization") version "1.4.10"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     application
 }
 group = "com.radeusgd"
@@ -32,6 +33,7 @@ kotlin {
         browser {
             binaries.executable()
             webpackTask {
+                sourceMaps = true
                 cssSupport.enabled = true
             }
             runTask {
@@ -96,7 +98,10 @@ tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
 tasks.getByName<Jar>("jvmJar") {
     dependsOn(tasks.getByName("jsBrowserProductionWebpack"))
     val jsBrowserProductionWebpack = tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack")
-    from(File(jsBrowserProductionWebpack.destinationDirectory, jsBrowserProductionWebpack.outputFileName))
+    from(
+        File(jsBrowserProductionWebpack.destinationDirectory, jsBrowserProductionWebpack.outputFileName),
+        File(jsBrowserProductionWebpack.destinationDirectory, "output.js.map") // TODO this is slightly ugly but we are in hurry
+    )
 }
 tasks.getByName<JavaExec>("run") {
     dependsOn(tasks.getByName<Jar>("jvmJar"))

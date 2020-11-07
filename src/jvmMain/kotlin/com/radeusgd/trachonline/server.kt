@@ -1,16 +1,15 @@
 package com.radeusgd.trachonline
 
-import io.ktor.application.*
+import com.radeusgd.trachonline.messages.ClientMessage
 import com.radeusgd.trachonline.messages.ServerMessage
-import io.ktor.html.respondHtml
-import io.ktor.http.HttpStatusCode
+import io.ktor.application.*
+import io.ktor.html.*
+import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
-import io.ktor.routing.get
-import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.http.content.resources
-import io.ktor.http.content.static
+import io.ktor.http.content.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.consumeEach
@@ -18,17 +17,13 @@ import kotlinx.html.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import com.radeusgd.trachonline.messages.ClientMessage
 import java.util.*
 
 fun HTML.index() {
     head {
-        title("Hello from Ktor!")
+        title("Hello from Trach Online!")
     }
     body {
-        div {
-            +"Hello from Ktor"
-        }
         div {
             id = "root"
         }
@@ -37,7 +32,10 @@ fun HTML.index() {
 }
 
 fun main() {
-    val server = GameServer()
+    val definition =
+        GameDefinition.loadResource("trach.json") ?: throw IllegalStateException("Could not find game description")
+    println(definition)
+    val server = GameServer(definition)
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
         install(WebSockets)
         routing {
@@ -68,12 +66,11 @@ fun main() {
                             System.err.println("Unexpected message $frame")
                         }
                     }
-                } catch(e: Exception) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
                     server.onExited(client)
                 }
-
             }
         }
     }.start(wait = true)

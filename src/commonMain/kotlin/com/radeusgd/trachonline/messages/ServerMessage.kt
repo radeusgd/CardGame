@@ -16,5 +16,4 @@ data class LogMessage(val text: String) : ServerMessage()
 data class ChatMessage(val nickname: String, val text: String) : ServerMessage()
 
 @Serializable
-data class UpdateTable(val gameState: GameSnapshot) : ServerMessage()
-
+data class UpdateGameState(val gameState: GameSnapshot) : ServerMessage()

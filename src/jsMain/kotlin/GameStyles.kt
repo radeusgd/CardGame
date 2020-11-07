@@ -1,51 +1,75 @@
 import kotlinx.css.*
 import styled.StyleSheet
 
-object GameStyles : StyleSheet("WelcomeStyles", isStatic = true) {
-    val textContainer by css {
-        padding(5.px)
+object GameStyles : StyleSheet("GameStyles", isStatic = true) {
 
-        backgroundColor = rgb(8, 97, 22)
-        color = rgb(56, 246, 137)
-    }
 
     val textInput by css {
-        margin(vertical = 5.px)
+        margin(vertical = 5.px, horizontal = 5.px)
 
         fontSize = 14.px
     }
 
     val buttonInput by css {
-        margin(vertical = 5.px)
+        margin(vertical = 5.px, horizontal = 5.px)
 
         fontSize = 14.px
     }
 
+    val chatActions by css {
+        bottom = LinearDimension("1%")
+        height =L
+    }
+
+
     val chatContainer by css {
         padding(5.px)
 
-        backgroundColor = rgb(8, 97, 22)
-        color = rgb(56, 246, 137)
+        backgroundColor = Color("#F0E9E3")
+        color = Color("#1A1813")
+        position = Position.absolute
+        bottom = LinearDimension("1%")
+        right = LinearDimension("1%")
+        width = LinearDimension("35%")
+        height = LinearDimension("35%")
+
+        boxSizing = BoxSizing.borderBox
+        overflowY = Overflow.scroll
+        overflowX = Overflow.hidden
     }
 
-    val gameBoardContainer by css {
+    val mainAreaContainer by css {
         padding(5.px)
 
-        backgroundColor = rgb(8, 97, 90)
-        color = rgb(56, 246, 137)
+        backgroundColor = Color("#DFAEB1")
+
+        top = LinearDimension("1%")
+        left = LinearDimension("1%")
+        width = LinearDimension("55%")
+        height = LinearDimension("55%")
     }
 
     val playersContainer by css {
         padding(5.px)
 
-        backgroundColor = rgb(8, 97, 22)
-        color = rgb(56, 246, 137)
+        backgroundColor = Color("#BFCEDF")
+        position = Position.absolute
+        top = LinearDimension("1%")
+        right = LinearDimension("1%")
+        height = LinearDimension("55%")
+        width = LinearDimension("35%")
+
+        overflowY = Overflow.scroll
     }
 
-    val myCardsContainer by css {
+    val privateAreaContainer by css {
         padding(5.px)
 
-        backgroundColor = rgb(98, 27, 22)
-        color = rgb(56, 246, 137)
+        backgroundColor = Color("#DFD7AC")
+        position = Position.absolute
+        left = LinearDimension("1%")
+        bottom = LinearDimension("1%")
+        width = LinearDimension("55%")
+        height = LinearDimension("22%")
     }
-} 
+}
