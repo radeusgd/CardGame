@@ -1,7 +1,7 @@
 package com.radeusgd.trachonline
 
 import io.ktor.application.*
-import messages.Message
+import com.radeusgd.trachonline.messages.ServerMessage
 import io.ktor.html.respondHtml
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.cio.websocket.*
@@ -18,6 +18,7 @@ import kotlinx.html.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import com.radeusgd.trachonline.messages.ClientMessage
 import java.util.*
 
 fun HTML.index() {
@@ -52,7 +53,7 @@ fun main() {
                 val client = object : Client {
                     override fun uuid() = uuid
 
-                    override fun sendMessage(message: Message) {
+                    override fun sendMessage(message: ServerMessage) {
                         async { socket.send(Frame.Text(Json.encodeToString(message))) }
                     }
                 }
@@ -61,7 +62,7 @@ fun main() {
                 try {
                     incoming.consumeEach { frame ->
                         if (frame is Frame.Text) {
-                            val message = Json.decodeFromString<Message>(frame.readText())
+                            val message = Json.decodeFromString<ClientMessage>(frame.readText())
                             server.onMessage(client, message)
                         } else {
                             System.err.println("Unexpected message $frame")

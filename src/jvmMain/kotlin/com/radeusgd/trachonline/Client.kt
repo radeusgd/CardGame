@@ -1,9 +1,9 @@
 package com.radeusgd.trachonline
 
-import messages.Message
+import com.radeusgd.trachonline.messages.ServerMessage
 import java.util.*
 
 interface Client {
     fun uuid(): UUID
-    fun sendMessage(message: Message)
+    fun sendMessage(message: ServerMessage)
 }

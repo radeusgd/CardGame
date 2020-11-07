@@ -1,25 +1,19 @@
 package com.radeusgd.trachonline
 
-import messages.*
+import com.radeusgd.trachonline.messages.*
 import java.util.concurrent.atomic.AtomicInteger
 
 data class GameClient(var nickName: String)
 
 class GameServer : Server<GameClient>() {
-    override fun onMessage(client: Client, message: Message) {
+
+    override fun onMessage(client: Client, message: ClientMessage) {
         when(message) {
-            is Error -> unexpectedMessage(message)
-            is LogMessage -> unexpectedMessage(message)
-            is ChatMessage -> broadcast(message)
-            is UpdateTable -> unexpectedMessage(message)
+            is SendChatMessage -> broadcast(ChatMessage(client.nickName(), message.text))
             is SetNickName -> setNickName(client, message)
             Joined -> playerJoined(client)
             Exited -> playerExited(client)
         }
-    }
-
-    private fun unexpectedMessage(message: Message) {
-        System.err.println("Unexpected message $message")
     }
 
     private fun setNickName(client: Client, message: SetNickName) {
@@ -35,6 +29,7 @@ class GameServer : Server<GameClient>() {
 
     private fun playerExited(client: Client) {
         log("Player ${client.nickName()} has joined.")
+        // TODO we may want to clean cards of that player
     }
 
     override fun initializeClientData(client: Client): GameClient = GameClient(freshTemporaryNickname())
