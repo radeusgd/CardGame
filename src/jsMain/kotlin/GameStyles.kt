@@ -16,6 +16,8 @@ import kotlinx.css.height
 import kotlinx.css.left
 import kotlinx.css.margin
 import kotlinx.css.maxWidth
+import kotlinx.css.minHeight
+import kotlinx.css.minWidth
 import kotlinx.css.overflowX
 import kotlinx.css.overflowY
 import kotlinx.css.padding
@@ -24,11 +26,19 @@ import kotlinx.css.position
 import kotlinx.css.px
 import kotlinx.css.right
 import kotlinx.css.top
+import kotlinx.css.vh
 import kotlinx.css.vw
 import kotlinx.css.width
+import kotlinx.css.zIndex
 import styled.StyleSheet
 
 object GameStyles : StyleSheet("GameStyles", isStatic = true) {
+
+    val boardAreaColor = Color("#938581")
+
+    val mainStyle by css {
+        backgroundColor = Color("#0C7C59")
+    }
 
     val input by css {
         margin(vertical = 5.px, horizontal = 5.px)
@@ -40,11 +50,12 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
         height = LinearDimension.auto
     }
 
+
     val chatContainer by css {
         padding(5.px)
 
-        backgroundColor = Color("#F0E9E3")
-        color = Color("#1A1813")
+        backgroundColor = Color("#FFFFFB")
+        color = Color("#2B303A")
         position = Position.absolute
         bottom = 1.pct
         right = 1.pct
@@ -59,7 +70,7 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
     val mainAreaContainer by css {
         padding(5.px)
 
-        backgroundColor = Color("#DFAEB1")
+        backgroundColor = boardAreaColor
 
         position = Position.absolute
         top = 1.pct
@@ -68,10 +79,18 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
         height = 55.pct
     }
 
+    fun personalArea(baseSize: Float): CSSBuilder.() -> Unit = {
+        display = Display.inlineBlock
+        minWidth = baseSize.vw
+        minHeight = baseSize.vh
+
+        backgroundColor = boardAreaColor
+    }
+
     val playersContainer by css {
         padding(5.px)
 
-        backgroundColor = Color("#BFCEDF")
+        backgroundColor = Color("#FFC145")
         position = Position.absolute
         top = 1.pct
         right = 1.pct
@@ -86,7 +105,7 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
     val privateAreaContainer by css {
         padding(5.px)
 
-        backgroundColor = Color("#DFD7AC")
+        backgroundColor = boardAreaColor
         position = Position.absolute
         left = 1.pct
         bottom = 1.pct
@@ -103,11 +122,12 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
     }
 
     fun placedEntityCss(placedEntity: PlacedEntity): CSSBuilder.() -> Unit = {
-        position = Position.relative
+        position = Position.absolute
         val x = placedEntity.position.x
         val y = placedEntity.position.y
         left = x.vw
         top = y.vw
+        zIndex = placedEntity.position.depth
     }
 
     val cardStackBorderStyle by css {

@@ -29,6 +29,14 @@ data class Deck(val basePath: String, val backName: String, val cards: List<Card
     fun spawn(): List<MaterializedCard> = cards.flatMap { card ->
         (1..card.count).map { card.spawn(this) }
     }
+
+    companion object {
+        fun shuffle(cards: List<MaterializedCard>): List<MaterializedCard> {
+            val mutable = cards.toMutableList()
+            mutable.shuffle()
+            return mutable
+        }
+    }
 }
 
 @Serializable
@@ -36,7 +44,7 @@ data class GameDefinition(val decks: List<Deck>) {
     fun spawnDecks(): List<List<MaterializedCard>> = decks.map { it.spawn() }
 
     fun prepareMainBoard(): BoardArea {
-        val stacks = spawnDecks().map { CardStack.make(it) }
+        val stacks = spawnDecks().map { CardStack.make(Deck.shuffle(it)) }
         // TODO better placement
         val placed = stacks.withIndex().map { (index, stack) ->
             PlacedEntity(stack, Position(20f + index * 100f, 10f, index))

@@ -6,7 +6,10 @@ import com.radeusgd.trachonline.util.UuidSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Position(val x: Float, val y: Float, val depth: Int)
+data class Position(val x: Float, val y: Float, val depth: Int) {
+    fun move(dx: Float, dy: Float): Position = copy(x = x + dx, y = y + dy)
+    fun moveUp(): Position = copy(depth = depth + 1)
+}
 
 @Serializable
 data class CardVisuals(val frontImage: String, val backImage: String)

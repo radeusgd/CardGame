@@ -1,13 +1,17 @@
+import Game.Companion.CHAT_ELEMENT_ID
 import com.radeusgd.trachonline.messages.SendChatMessage
 import com.radeusgd.trachonline.messages.SetNickName
 import kotlinx.browser.window
+import kotlinx.html.DIV
 import kotlinx.html.InputType
+import kotlinx.html.id
 import kotlinx.html.js.onChangeFunction
 import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onKeyDownFunction
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.KeyboardEvent
+import org.w3c.dom.get
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -45,6 +49,10 @@ class Chat(props: ChatProps) : RComponent<ChatProps, ChatState>(props) {
             }
 
             styledDiv {
+                attrs {
+                    id = CHAT_ELEMENT_ID
+                }
+
                 css {
                     +GameStyles.chatActions
                 }

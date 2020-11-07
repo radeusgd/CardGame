@@ -22,6 +22,18 @@ data class MoveEntity(
 ) : ClientMessage()
 
 @Serializable
+data class PickStack(
+    @Serializable(with = UuidSerializer::class)
+    val entityUuid: Uuid
+) : ClientMessage()
+
+@Serializable
+data class FlipCard(
+    @Serializable(with = UuidSerializer::class)
+    val entityUuid: Uuid
+) : ClientMessage()
+
+@Serializable
 object Joined : ClientMessage()
 
 @Serializable

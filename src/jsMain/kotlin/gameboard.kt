@@ -14,6 +14,8 @@ interface GameboardState : RState
 @JsExport
 class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardState>(props) {
 
+    val playerPersonalAreaScale = 3f
+
     override fun RBuilder.render() {
         styledDiv {
             css {
@@ -36,17 +38,18 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
 
             props.gameSnapshot.players.forEach {
                 p {
-                    +"${it.name}: Ya ma ${it.privateAreaCount} kardz (na rece)"
+                    +"${it.name}: ${it.privateAreaCount} kart na ręce"
                 }
 
                 styledDiv {
                     css {
+                        +GameStyles.personalArea(playerPersonalAreaScale)
                     }
 
                     child(BoardAreaView::class) {
                         attrs {
                             board = it.personalArea
-                            entityBaseSize = 3f
+                            entityBaseSize = playerPersonalAreaScale
                         }
                     }
                 }

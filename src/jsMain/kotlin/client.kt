@@ -5,6 +5,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.WebSocket
 import react.dom.render
+import styled.styledDiv
 
 val socketUrl = "ws://" + window.location.host + "/socket"
 val socket: WebSocket = WebSocket(socketUrl)
@@ -16,8 +17,8 @@ fun sendMessage(message: ClientMessage) {
 fun main() {
     window.onload = {
         render(document.getElementById("root")) {
-            child(Game::class) {
-                attrs {
+                child(Game::class) {
+                    attrs {
 //                    name = "Kotlin/JS"
                 }
             }

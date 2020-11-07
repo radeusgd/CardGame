@@ -1,16 +1,24 @@
 package com.radeusgd.trachonline
 
 import com.benasher44.uuid.Uuid
+import com.radeusgd.trachonline.board.BoardDestination
+import com.radeusgd.trachonline.board.Card
+import com.radeusgd.trachonline.board.CardStack
 import com.radeusgd.trachonline.board.GameSnapshot
 import com.radeusgd.trachonline.board.Player
+import com.radeusgd.trachonline.board.StackDestination
+import com.radeusgd.trachonline.gamearea.AreaLocationDescription
 import com.radeusgd.trachonline.gamearea.GameArea
+import com.radeusgd.trachonline.gamearea.RemovalResult
 import com.radeusgd.trachonline.gamedefinition.GameDefinition
 import com.radeusgd.trachonline.messages.ChatMessage
 import com.radeusgd.trachonline.messages.ClientMessage
 import com.radeusgd.trachonline.messages.Exited
+import com.radeusgd.trachonline.messages.FlipCard
 import com.radeusgd.trachonline.messages.Joined
 import com.radeusgd.trachonline.messages.LogMessage
 import com.radeusgd.trachonline.messages.MoveEntity
+import com.radeusgd.trachonline.messages.PickStack
 import com.radeusgd.trachonline.messages.SendChatMessage
 import com.radeusgd.trachonline.messages.SetNickName
 import com.radeusgd.trachonline.messages.UpdateGameState
@@ -25,6 +33,8 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             is SendChatMessage -> broadcast(ChatMessage(client.nickName(), message.text))
             is SetNickName -> setNickName(client, message)
             is MoveEntity -> moveEntity(client, message)
+            is PickStack -> pickStack(client, message)
+            is FlipCard -> flipCard(client, message)
             Joined -> playerJoined(client)
             Exited -> playerExited(client)
         }
@@ -50,9 +60,80 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
     }
 
     private fun moveEntity(client: Client, message: MoveEntity) {
-        TODO("moveentity")
-        broadcastGameUpdates()
+        val removalResult = area.removeEntity(message.entityUuid)
+        if (removalResult != null) {
+            val destination = message.destination
+            val entity = removalResult.entity
+            val movedArea = removalResult.newArea.addEntity(destination, entity.entity)
+            if (movedArea != null) {
+                area = movedArea
+                val source = renderSourceLocation(removalResult.locationDescription)
+                // TODO better wording of destination too
+                log("${client.nickName()} moves a card from $source to $destination")
+                broadcastGameUpdates()
+            } else {
+                log("Entity was supposed to be moved to $destination which could not be found.")
+            }
+        } else {
+            log("Entity to move, ${message.entityUuid}, could not be found.")
+        }
     }
+
+    private fun pickStack(client: Client, message: PickStack) {
+        val removalResult = area.removeEntity(message.entityUuid)
+        if (removalResult != null) {
+            val entity = removalResult.entity
+            val stack = entity.entity as? CardStack
+            if (stack != null) {
+                val card = stack.cards.first()
+                val rest = stack.cards.drop(1)
+
+                // TODO not sure what is the right value for this shift
+                // TODO it could be a different board!
+                val cardDestination = BoardDestination(area.mainArea.uuid, entity.position.move(3f,5f).moveUp())
+                val addedArea = removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
+
+                val leftOverEntity = if (rest.size == 1) rest.first() else stack.copy(cards = rest)
+                val destination = BoardDestination(area.mainArea.uuid, entity.position)
+
+                val finalArea = addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
+                area = finalArea
+                log("${client.nickName()} picks a card from a stack")
+                broadcastGameUpdates()
+            } else {
+                log("was not a stack") // TODO
+            }
+        } else {
+            log("Entity to pick from, ${message.entityUuid}, could not be found.")
+        }
+    }
+
+    private fun flipCard(client: Client, message: FlipCard) {
+        val removalResult = area.removeEntity(message.entityUuid)
+        if (removalResult != null) {
+            val entity = removalResult.entity
+            val card = entity.entity as? Card
+            if (card != null) {
+                val newCard = card.copy(isShowingFront = !card.isShowingFront)
+
+                // TODO it could be a different destination! check the location!
+                val destination = BoardDestination(area.mainArea.uuid, entity.position)
+
+                val updatedArea = removalResult.newArea.addEntity(destination, newCard) ?: throw IllegalStateException("Board disappeared?!")
+
+                area = updatedArea
+                log("${client.nickName()} flips a card")
+                broadcastGameUpdates()
+            } else {
+                log("was not a card") // TODO
+            }
+        } else {
+            log("Entity to flip, ${message.entityUuid}, could not be found.")
+        }
+    }
+
+    // TODO prettier wording here
+    private fun renderSourceLocation(areaLocationDescription: AreaLocationDescription): String = areaLocationDescription.toString()
 
     private fun broadcastGameUpdates() {
         connectedClients().forEach {

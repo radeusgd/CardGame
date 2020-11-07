@@ -1,3 +1,4 @@
+import com.benasher44.uuid.Uuid
 import com.radeusgd.trachonline.board.BoardArea
 import react.RBuilder
 import react.RComponent
@@ -17,6 +18,7 @@ class BoardAreaView(props: BoardAreaViewProps) : RComponent<BoardAreaViewProps, 
                 attrs {
                     placedEntity = it
                     baseSize = props.entityBaseSize
+                    parentBoardId = props.board.uuid
                 }
             }
         }

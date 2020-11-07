@@ -4,13 +4,18 @@ import com.radeusgd.trachonline.messages.Error
 import com.radeusgd.trachonline.messages.LogMessage
 import com.radeusgd.trachonline.messages.ServerMessage
 import com.radeusgd.trachonline.messages.UpdateGameState
+import kotlinx.css.script
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.MessageEvent
 import react.RBuilder
 import react.RComponent
 import react.RProps
+import kotlinx.browser.document
 import react.RState
+import styled.css
+import styled.styledDiv
+
 
 external interface ViewProps : RProps
 
@@ -50,20 +55,34 @@ class Game(props: ViewProps) : RComponent<ViewProps, ViewState>(props) {
     private fun addChatMessage(message: String) {
         console.log(message)
         setState(ViewState(messages = state.messages + message, gameSnapshot = state.gameSnapshot))
+        scrollChatToBottom()
     }
 
+    private fun scrollChatToBottom() : Unit = document.getElementById(CHAT_ELEMENT_ID)?.run {
+        scrollIntoView(false)
+    }?: console.error("Failed to scroll")
+
     override fun RBuilder.render() {
+        styledDiv {
+            css {
+                +GameStyles.mainStyle
+            }
 
-        child(Gameboard::class) {
-            attrs {
-                gameSnapshot = state.gameSnapshot
+            child(Gameboard::class) {
+                attrs {
+                    gameSnapshot = state.gameSnapshot
+                }
+            }
+
+            child(Chat::class) {
+                attrs {
+                    messages = state.messages
+                }
             }
         }
+    }
 
-        child(Chat::class) {
-            attrs {
-                messages = state.messages
-            }
-        }
+    companion object {
+        const val CHAT_ELEMENT_ID = "chat"
     }
 }
