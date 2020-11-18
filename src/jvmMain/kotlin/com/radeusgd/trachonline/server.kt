@@ -33,7 +33,7 @@ import java.util.UUID
 
 fun HTML.index() {
     head {
-        title("Hello from Trach Online!")
+        title("Trach Online")
     }
     body {
         div {

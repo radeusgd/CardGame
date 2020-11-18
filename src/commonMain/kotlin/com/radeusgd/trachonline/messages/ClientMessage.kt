@@ -24,13 +24,27 @@ data class MoveEntity(
 @Serializable
 data class PickStack(
     @Serializable(with = UuidSerializer::class)
-    val entityUuid: Uuid
+    val stackUuid: Uuid
+) : ClientMessage()
+
+@Serializable
+data class ShuffleStack(
+    @Serializable(with = UuidSerializer::class)
+    val stackUuid: Uuid
+) : ClientMessage()
+
+@Serializable
+data class PutOnStack(
+    @Serializable(with = UuidSerializer::class)
+    val stackUuid: Uuid,
+    @Serializable(with = UuidSerializer::class)
+    val cardUuid: Uuid
 ) : ClientMessage()
 
 @Serializable
 data class FlipCard(
     @Serializable(with = UuidSerializer::class)
-    val entityUuid: Uuid
+    val cardUuid: Uuid
 ) : ClientMessage()
 
 @Serializable

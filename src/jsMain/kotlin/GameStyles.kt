@@ -2,6 +2,7 @@ import com.radeusgd.trachonline.board.PlacedEntity
 import kotlinx.css.BoxSizing
 import kotlinx.css.CSSBuilder
 import kotlinx.css.Color
+import kotlinx.css.Cursor
 import kotlinx.css.Display
 import kotlinx.css.LinearDimension
 import kotlinx.css.Overflow
@@ -10,7 +11,9 @@ import kotlinx.css.backgroundColor
 import kotlinx.css.bottom
 import kotlinx.css.boxSizing
 import kotlinx.css.color
+import kotlinx.css.cursor
 import kotlinx.css.display
+import kotlinx.css.float
 import kotlinx.css.fontSize
 import kotlinx.css.height
 import kotlinx.css.left
@@ -18,6 +21,7 @@ import kotlinx.css.margin
 import kotlinx.css.maxWidth
 import kotlinx.css.minHeight
 import kotlinx.css.minWidth
+import kotlinx.css.opacity
 import kotlinx.css.overflowX
 import kotlinx.css.overflowY
 import kotlinx.css.padding
@@ -113,7 +117,7 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
         height = 22.pct
     }
 
-    fun cardStyle(baseSize: Float): CSSBuilder.() -> Unit = {
+    fun cardStyle(baseSize: kotlin.Float): CSSBuilder.() -> Unit = {
         display = Display.inlineBlock
         maxWidth = baseSize.vw
 //        maxHeight = baseSize.px
@@ -134,5 +138,16 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
         display = Display.inlineBlock
         padding(5.px)
         backgroundColor = Color("#00B5AB")
+        hover {
+            descendants("a") {
+                opacity = 1
+            }
+        }
+    }
+
+    val hiddenAStyle by css {
+        opacity = 0
+        float = kotlinx.css.Float.right
+        cursor = Cursor.pointer
     }
 }
