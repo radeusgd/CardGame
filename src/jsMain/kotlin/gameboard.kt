@@ -1,4 +1,5 @@
 import com.radeusgd.trachonline.board.GameSnapshot
+import kotlinx.css.Color
 import react.RBuilder
 import react.RComponent
 import react.RProps
@@ -21,12 +22,12 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
             css {
                 +GameStyles.mainAreaContainer
             }
-            +"Основная Область"
-
             child(BoardAreaView::class) {
                 attrs {
                     board = props.gameSnapshot.mainArea
                     entityBaseSize = 5f
+                    name = "Główna plansza"
+                    background = GameStyles.boardAreaColor
                 }
             }
         }
@@ -34,7 +35,7 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
             css {
                 +GameStyles.playersContainer
             }
-            +"Игроки"
+            +"Gracze"
 
             props.gameSnapshot.players.forEach {
                 p {
@@ -45,11 +46,12 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
                     css {
                         +GameStyles.personalArea(playerPersonalAreaScale)
                     }
-
                     child(BoardAreaView::class) {
                         attrs {
                             board = it.personalArea
                             entityBaseSize = playerPersonalAreaScale
+                            name = null
+                            background = GameStyles.boardAreaColor
                         }
                     }
                 }
@@ -59,14 +61,19 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
             css {
                 +GameStyles.privateAreaContainer
             }
-            +"Частная Территория"
 
             child(BoardAreaView::class) {
                 attrs {
                     board = props.gameSnapshot.privateArea
-                    entityBaseSize = 5f
+                    entityBaseSize = 10f
+                    name = "Karty na ręce"
+                    background = Color("#938521")
                 }
             }
         }
+    }
+
+    companion object {
+        val BoardAreaClass = "board-area"
     }
 }

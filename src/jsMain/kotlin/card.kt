@@ -11,10 +11,9 @@ import com.radeusgd.trachonline.messages.PickStack
 import com.radeusgd.trachonline.messages.PutOnStack
 import com.radeusgd.trachonline.messages.ShuffleStack
 import kotlin.math.max
+import kotlin.math.min
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.css.Color
-import kotlinx.css.backgroundColor
 import kotlinx.dom.hasClass
 import kotlinx.html.IMG
 import kotlinx.html.classes
@@ -22,11 +21,8 @@ import kotlinx.html.js.onClickFunction
 import kotlinx.html.js.onDoubleClickFunction
 import kotlinx.html.js.onDragEndFunction
 import kotlinx.html.js.onDragEnterFunction
-import kotlinx.html.js.onDragFunction
 import kotlinx.html.js.onDragLeaveFunction
 import kotlinx.html.js.onDragStartFunction
-import kotlinx.html.js.onDropFunction
-import kotlinx.html.style
 import org.w3c.dom.DragEvent
 import org.w3c.dom.Image
 import org.w3c.dom.get
@@ -69,36 +65,47 @@ class EntityView(props: EntityProps) : RComponent<EntityProps, EntityState>(prop
                     console.log(event)
                     val dragged = (event.asDynamic().nativeEvent as? DragEvent)
                     dragged?.let {
-                        var wasPutOnStack = false
-                        val targetElement = document.elementFromPoint(it.pageX, it.pageY)
-                        targetElement?.let {
-                            console.log("Target element", it)
-                            if (it.hasClass(StackDragTargetClassName) && entity is Card) {
-                                it.attributes.get("data-stackid")?.value?.let {
-                                    console.log(it)
-                                    val uuid: Uuid = uuidFrom(it)
-                                    sendMessage(PutOnStack(stackUuid = uuid, cardUuid = entity.uuid))
-                                    wasPutOnStack = true
+                        var hasBeenProcessed = false
+                        val elementsBelow = document.elementsFromPoint(it.pageX, it.pageY)
+                        val possibleStack = elementsBelow.find { it.hasClass(StackDragTargetClassName) }
+                        val possibleBoard = elementsBelow.find { it.hasClass(Gameboard.BoardAreaClass) }
+                        console.log("Possible stack: $possibleStack")
+                        console.log("Possible board: $possibleBoard")
+
+                        if (entity is Card) {
+                            possibleStack?.attributes?.get("data-stackid")?.value?.let {
+                                console.log("Stack $it")
+                                val uuid: Uuid = uuidFrom(it)
+                                sendMessage(PutOnStack(stackUuid = uuid, cardUuid = entity.uuid))
+                                hasBeenProcessed = true
+                            }
+                        }
+
+                        if (hasBeenProcessed) return@let
+
+                        possibleBoard?.let { board ->
+                            board.attributes?.get("data-boardid")?.value?.let { boardId ->
+                                val rect = board.getBoundingClientRect()
+                                console.log("Board $boardId")
+
+                                val vw = max(document.documentElement?.clientWidth ?: 0, window.innerWidth)
+                                val vh = max(document.documentElement?.clientHeight ?: 0, window.innerHeight)
+                                val vmin = if  (vw == 0) vh else if (vh == 0) vw else min(vw, vh)
+                                if (vmin == 0) {
+                                    console.error("Could not estimate viewport size!")
+                                } else {
+                                    val x: Float = ((it.clientX - rect.left) / vmin * 100f).toFloat()
+                                    val y: Float = ((it.clientY - rect.top) / vmin * 100f).toFloat()
+                                    console.log(x to y)
+                                    val depth = 0 // TODO depth
+                                    val destination = BoardDestination(uuidFrom(boardId), Position(x, y, depth))
+                                    sendMessage(MoveEntity(entity.uuid, destination))
                                 }
                             }
                         }
 
-                        if (wasPutOnStack) return@let
-
-                        val vw = max(document.documentElement?.clientWidth ?: 0, window.innerWidth)
-                        if (vw == 0) {
-                            console.error("Could not estimate viewport width!")
-                        } else {
-                            val x: Float = (it.pageX / vw * 100f).toFloat()
-                            val y: Float = (it.pageY / vw * 100f).toFloat()
-                            console.log(x to y)
-                            // TODO possibility to move to different board
-                            // TODO how to detect board id based on position???
-                            // TODO we may be able to detect boards by the target data
-                            val board = props.parentBoardId
-                            val depth = 0 // TODO depth
-                            val destination = BoardDestination(board, Position(x, y, depth))
-                            sendMessage(MoveEntity(entity.uuid, destination))
+                        if (!hasBeenProcessed) {
+                            console.log("No board nor stack target found")
                         }
                     }
                 }
