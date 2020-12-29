@@ -13,11 +13,19 @@ abstract class Server<ClientData> {
             client.sendMessage(message)
         }
 
-    fun connectedClients(): List<Client> = clients.map { it.value.first }
+    fun connectedClients(): List<Client> = clients.values.map { it.first }
 
-    fun onJoined(client: Client) = client.run {
-        initializeClientData(this).let { clientData -> clients.put(uuid(), Pair(this, clientData)) }
-        onMessage(this, Joined)
+    fun onJoined(client: Client) {
+        val existingClient = clients[client.uuid()]
+        val clientData = if (existingClient != null) {
+            System.err.println("Exisitng client ${client.uuid()} has been replaced by a new connection.")
+            existingClient.first.disconnect()
+            existingClient.second
+        } else {
+            initializeClientData(client)
+        }
+        clients[client.uuid()] = Pair(client, clientData)
+        onMessage(client, Joined)
     }
 
     fun onExited(client: Client) = client.run {

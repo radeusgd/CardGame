@@ -6,4 +6,5 @@ import java.util.UUID
 interface Client {
     fun uuid(): UUID
     fun sendMessage(message: ServerMessage)
+    fun disconnect(): Unit
 }

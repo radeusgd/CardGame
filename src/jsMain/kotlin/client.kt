@@ -16,6 +16,7 @@ fun sendMessage(message: ClientMessage) {
 
 fun main() {
     window.onload = {
+        document.cookie
         render(document.getElementById("root")) {
                 child(Game::class) {
                     attrs {

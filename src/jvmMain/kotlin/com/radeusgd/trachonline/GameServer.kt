@@ -29,7 +29,9 @@ import com.radeusgd.trachonline.messages.ShuffleStack
 import com.radeusgd.trachonline.messages.UpdateGameState
 import java.util.concurrent.atomic.AtomicInteger
 
-data class GameClient(var nickName: String)
+data class GameClient(var nickName: String, var connected: Boolean) {
+    fun render(): String = if (connected) nickName else "$nickName (disconnected)"
+}
 
 class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
 
@@ -66,7 +68,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             privateArea = currentPlayerAreas.privateArea,
             players = currentArea.playerAreas.map { areas ->
                 Player(
-                    name = getPlayerData(areas.playerId)?.nickName!!,
+                    name = getPlayerData(areas.playerId)?.render() ?: "Unknown player?!",
                     personalArea = areas.personalArea,
                     privateAreaCount = areas.privateArea.countCards()
                 )
@@ -223,20 +225,31 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val oldNickName = data.nickName
         data.nickName = message.newNickname
         log("Player $oldNickName is now called ${message.newNickname}.")
+        broadcastGameUpdates()
     }
 
     private val players = HashMap<Uuid, GameClient>()
 
     private fun playerJoined(client: Client) {
-        players.put(client.uuid(), GameClient(freshTemporaryNickname()))
-        log("Player ${client.nickName()} has joined.")
-        area = area.addPlayer(client.uuid())
-        broadcastGameUpdates()
+        val existingEntry = players[client.uuid()]
+        if (existingEntry == null) {
+            players[client.uuid()] = GameClient(freshTemporaryNickname(), true)
+            log("Player ${client.nickName()} has joined.")
+            area = area.addPlayer(client.uuid())
+        } else {
+            players[client.uuid()] = existingEntry.copy(connected = true)
+            log("Player ${client.nickName()} has reconnected.")
+        }
+        broadcastGameUpdates() // TODO it seems that the re-joined player very rarely does not get refreshed board state immediately
     }
 
     private fun playerExited(client: Client) {
-        log("Player ${client.nickName()} has joined.")
-        // TODO we may want to clean cards of that player
+        log("Player ${client.nickName()} has been disconnected.")
+        val entry = players[client.uuid()]
+        if (entry != null) {
+            players[client.uuid()] = entry.copy(connected = false)
+            broadcastGameUpdates()
+        }
     }
 
     override fun initializeClientData(client: Client): Unit = Unit
