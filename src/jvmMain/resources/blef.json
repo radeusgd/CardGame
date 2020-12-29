@@ -1,0 +1,107 @@
+{
+  "name": "Blef",
+  "decks": [
+    {
+      "basePath": "bridge-cards",
+      "backName": "gray_back.png",
+      "cards": [
+        {
+          "name": "9C.png",
+          "count": 1
+        },
+        {
+          "name": "10C.png",
+          "count": 1
+        },
+        {
+          "name": "AC.png",
+          "count": 1
+        },
+        {
+          "name": "JC.png",
+          "count": 1
+        },
+        {
+          "name": "KC.png",
+          "count": 1
+        },
+        {
+          "name": "QC.png",
+          "count": 1
+        },
+        {
+          "name": "9D.png",
+          "count": 1
+        },
+        {
+          "name": "10D.png",
+          "count": 1
+        },
+        {
+          "name": "AD.png",
+          "count": 1
+        },
+        {
+          "name": "JD.png",
+          "count": 1
+        },
+        {
+          "name": "KD.png",
+          "count": 1
+        },
+        {
+          "name": "QD.png",
+          "count": 1
+        },
+        {
+          "name": "9H.png",
+          "count": 1
+        },
+        {
+          "name": "10H.png",
+          "count": 1
+        },
+        {
+          "name": "AH.png",
+          "count": 1
+        },
+        {
+          "name": "JH.png",
+          "count": 1
+        },
+        {
+          "name": "KH.png",
+          "count": 1
+        },
+        {
+          "name": "QH.png",
+          "count": 1
+        },
+        {
+          "name": "9S.png",
+          "count": 1
+        },
+        {
+          "name": "10S.png",
+          "count": 1
+        },
+        {
+          "name": "AS.png",
+          "count": 1
+        },
+        {
+          "name": "JS.png",
+          "count": 1
+        },
+        {
+          "name": "KS.png",
+          "count": 1
+        },
+        {
+          "name": "QS.png",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

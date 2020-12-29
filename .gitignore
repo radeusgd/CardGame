@@ -35,4 +35,4 @@ build/
 gradle.properties
 gradle/
 
-src/jvmMain/resources/trach-cards
+src/jvmMain/resources/*-cards

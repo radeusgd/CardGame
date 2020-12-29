@@ -1,4 +1,5 @@
 {
+  "name": "Trach",
   "decks": [
     {
       "basePath": "trach-cards",
@@ -43,6 +44,16 @@
         {
           "name": "podniesienie_priorytetu-2.jpg",
           "count": 1
+        }
+      ]
+    },
+    {
+      "basePath": "hearts-cards",
+      "backName": "heartfull.png",
+      "cards": [
+        {
+          "name": "heartempty.png",
+          "count": 100
         }
       ]
     }

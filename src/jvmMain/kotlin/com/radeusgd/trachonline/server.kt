@@ -82,10 +82,11 @@ data class PlayerSession(val playerId: Uuid) {
 }
 
 fun main() {
-    val definition =
-        GameDefinition.loadResource("trach.json") ?: throw IllegalStateException("Could not find game description")
-    println(definition)
-    val server = GameServer(definition)
+    val trach =
+        GameDefinition.loadResource("trach.json") ?: throw IllegalStateException("Could not load Trach")
+    val blef =
+        GameDefinition.loadResource("blef.json") ?: throw IllegalStateException("Could not load Blef")
+    val server = GameServer(listOf(trach, blef))
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
         install(WebSockets)
         install(Sessions) {

@@ -40,14 +40,14 @@ data class Deck(val basePath: String, val backName: String, val cards: List<Card
 }
 
 @Serializable
-data class GameDefinition(val decks: List<Deck>) {
+data class GameDefinition(val name: String, val decks: List<Deck>) {
     fun spawnDecks(): List<List<MaterializedCard>> = decks.map { it.spawn() }
 
     fun prepareMainBoard(): BoardArea {
         val stacks = spawnDecks().map { CardStack.make(Deck.shuffle(it)) }
         // TODO better placement
         val placed = stacks.withIndex().map { (index, stack) ->
-            PlacedEntity(stack, Position(20f + index * 100f, 10f, index))
+            PlacedEntity(stack, Position(5f + index * 11f, 10f, index))
         }
         return BoardArea.empty().add(placed)
     }

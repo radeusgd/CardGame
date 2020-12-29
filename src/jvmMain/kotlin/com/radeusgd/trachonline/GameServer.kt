@@ -1,6 +1,7 @@
 package com.radeusgd.trachonline
 
 import com.benasher44.uuid.Uuid
+import com.radeusgd.trachonline.board.BoardArea
 import com.radeusgd.trachonline.board.BoardDestination
 import com.radeusgd.trachonline.board.Card
 import com.radeusgd.trachonline.board.CardStack
@@ -10,6 +11,7 @@ import com.radeusgd.trachonline.gamearea.AreaLocationDescription
 import com.radeusgd.trachonline.gamearea.GameArea
 import com.radeusgd.trachonline.gamearea.MainArea
 import com.radeusgd.trachonline.gamearea.PersonalArea
+import com.radeusgd.trachonline.gamearea.PlayerAreas
 import com.radeusgd.trachonline.gamearea.PrivateArea
 import com.radeusgd.trachonline.gamedefinition.Deck
 import com.radeusgd.trachonline.gamedefinition.GameDefinition
@@ -27,20 +29,28 @@ import com.radeusgd.trachonline.messages.SendChatMessage
 import com.radeusgd.trachonline.messages.SetNickName
 import com.radeusgd.trachonline.messages.ShuffleStack
 import com.radeusgd.trachonline.messages.UpdateGameState
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 data class GameClient(var nickName: String, var connected: Boolean) {
     fun render(): String = if (connected) nickName else "$nickName (disconnected)"
 }
 
-class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
+class GameServer(val gameDefinitions: List<GameDefinition>) : Server<Unit>() {
 
     class LogicError(message: String) : RuntimeException(message)
 
     override fun handleMessage(client: Client, message: ClientMessage) {
         try {
             when (message) {
-                is SendChatMessage -> broadcast(ChatMessage(client.nickName(), message.text))
+                is SendChatMessage ->
+                    if (message.text.startsWith("/")) {
+                        handleCommand(client, message.text)
+                    } else {
+                        broadcast(ChatMessage(client.nickName(), message.text))
+                    }
                 is SetNickName -> setNickName(client, message)
                 is MoveEntity -> moveEntity(client, message)
                 is PickStack -> pickStack(client, message)
@@ -57,7 +67,33 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         }
     }
 
-    var area: GameArea = GameArea(gameDefinition.prepareMainBoard(), listOf())
+    var area: GameArea = GameArea(BoardArea.empty(), listOf())
+
+    init {
+        try {
+            restartGame(gameDefinitions.first().name)
+        } catch (exception: Throwable) {
+            exception.printStackTrace()
+        }
+    }
+
+    fun handleCommand(client: Client, text: String) {
+        val restartCommand = "/restart-game "
+        if (text.startsWith(restartCommand)) {
+            val arg = text.substring(restartCommand.length)
+            restartGame(arg)
+        } else {
+            client.sendMessage(LogMessage("Invalid command: $text"))
+        }
+    }
+
+    fun restartGame(name: String) {
+        val game = gameDefinitions.find { it.name == name } ?: throw LogicError("Game not found")
+        val clearedPlayers = area.playerAreas.map { PlayerAreas(it.playerId, BoardArea.empty(), BoardArea.empty()) }
+        area = GameArea(game.prepareMainBoard(), clearedPlayers)
+        log("Started new $name game")
+        broadcastGameUpdates()
+    }
 
     fun takeSnapshot(playerId: Uuid): GameSnapshot {
         val currentArea = area
@@ -268,6 +304,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
 
     fun log(message: String) {
         System.out.println(message)
-        broadcast(LogMessage(message))
+        val time = ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).withNano(0).format(DateTimeFormatter.ISO_LOCAL_TIME)
+        broadcast(LogMessage("($time) $message"))
     }
 }
