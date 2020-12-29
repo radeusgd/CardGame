@@ -1,7 +1,7 @@
 package com.radeusgd.trachonline.messages
 
 import com.benasher44.uuid.Uuid
-import com.radeusgd.trachonline.board.EntityDestination
+import com.radeusgd.trachonline.board.BoardDestination
 import com.radeusgd.trachonline.util.UuidSerializer
 import kotlinx.serialization.Serializable
 
@@ -18,7 +18,7 @@ data class SetNickName(val newNickname: String) : ClientMessage()
 data class MoveEntity(
     @Serializable(with = UuidSerializer::class)
     val entityUuid: Uuid,
-    val destination: EntityDestination
+    val destination: BoardDestination
 ) : ClientMessage()
 
 @Serializable

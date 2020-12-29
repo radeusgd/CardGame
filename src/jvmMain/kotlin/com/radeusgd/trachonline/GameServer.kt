@@ -8,6 +8,9 @@ import com.radeusgd.trachonline.board.GameSnapshot
 import com.radeusgd.trachonline.board.Player
 import com.radeusgd.trachonline.gamearea.AreaLocationDescription
 import com.radeusgd.trachonline.gamearea.GameArea
+import com.radeusgd.trachonline.gamearea.MainArea
+import com.radeusgd.trachonline.gamearea.PersonalArea
+import com.radeusgd.trachonline.gamearea.PrivateArea
 import com.radeusgd.trachonline.gamedefinition.Deck
 import com.radeusgd.trachonline.gamedefinition.GameDefinition
 import com.radeusgd.trachonline.messages.ChatMessage
@@ -77,10 +80,11 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val movedArea = removalResult.newArea.addEntity(destination, entity.entity)
             ?: throw LogicError("Entity was supposed to be moved to $destination which could not be found.")
         area = movedArea
-        val source = renderSourceLocation(removalResult.locationDescription)
         // TODO better wording of destination too
-        log("${client.nickName()} moves a card from $source to $destination")
         broadcastGameUpdates()
+        val source = renderLocation(removalResult.locationDescription)
+        val renderedDestination = area.describeBoard(destination.boardId)?.let { renderLocation(it) } ?: "Unknown board"
+        log("${client.nickName()} moves a card from $source to $renderedDestination")
     }
 
     private fun pickStack(client: Client, message: PickStack) {
@@ -103,8 +107,9 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val finalArea =
             addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
-        log("${client.nickName()} picks a card from a stack")
         broadcastGameUpdates()
+        val location = renderLocation(removalResult.locationDescription)
+        log("${client.nickName()} picks a card from a stack in $location")
     }
 
     private fun flipCard(client: Client, message: FlipCard) {
@@ -121,8 +126,9 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             removalResult.newArea.addEntity(destination, newCard) ?: throw IllegalStateException("Board disappeared?!")
 
         area = updatedArea
-        log("${client.nickName()} flips a card")
         broadcastGameUpdates()
+        val location = renderLocation(removalResult.locationDescription)
+        log("${client.nickName()} flips a card in $location")
     }
 
     private fun shuffleStack(client: Client, message: ShuffleStack) {
@@ -138,8 +144,9 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val finalArea =
             removalResult.newArea.addEntity(destination, shuffled) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
-        log("${client.nickName()} shuffles a stack")
         broadcastGameUpdates()
+        val location = renderLocation(removalResult.locationDescription)
+        log("${client.nickName()} shuffles a stack in $location")
     }
 
     private fun putOnStack(client: Client, message: PutOnStack) {
@@ -159,14 +166,26 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val finalArea =
             areaPrim.addEntity(destination, updatedStack) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
-        log("${client.nickName()} places a card into a stack")
         broadcastGameUpdates()
+        val stackLocation = renderLocation(stackRemovalResult.locationDescription)
+        val cardLocation = renderLocation(cardRemovalResult.locationDescription)
+        log("${client.nickName()} places a card from $cardLocation onto a stack in $stackLocation")
     }
 
-
-    // TODO prettier wording here
-    private fun renderSourceLocation(areaLocationDescription: AreaLocationDescription): String =
-        areaLocationDescription.toString()
+    private fun renderLocation(areaLocationDescription: AreaLocationDescription): String =
+        when (areaLocationDescription) {
+            is PrivateArea -> {
+                val id = areaLocationDescription.playerId
+                val player = getPlayerData(id) ?: throw LogicError("Player $id not found!")
+                player.nickName + "'s hand"
+            }
+            is PersonalArea -> {
+                val id = areaLocationDescription.playerId
+                val player = getPlayerData(id) ?: throw LogicError("Player $id not found!")
+                player.nickName + "'s visible cards"
+            }
+            MainArea -> "Main area"
+        }
 
     private fun broadcastGameUpdates() {
         connectedClients().forEach {
