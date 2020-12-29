@@ -80,7 +80,6 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val movedArea = removalResult.newArea.addEntity(destination, entity.entity)
             ?: throw LogicError("Entity was supposed to be moved to $destination which could not be found.")
         area = movedArea
-        // TODO better wording of destination too
         broadcastGameUpdates()
         val source = renderLocation(removalResult.locationDescription)
         val renderedDestination = area.describeBoard(destination.boardId)?.let { renderLocation(it) } ?: "Unknown board"
@@ -95,9 +94,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val card = stack.cards.first()
         val rest = stack.cards.drop(1)
 
-        // TODO not sure what is the right value for this shift
-        // TODO it could be a different board!
-        val cardDestination = BoardDestination(area.mainArea.uuid, entity.position.move(3f, 5f).moveUp())
+        val cardDestination = BoardDestination(removalResult.locationId, entity.position.move(3f, 5f).moveUp())
         val addedArea =
             removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
 
@@ -119,8 +116,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val card = entity.entity as? Card ?: throw LogicError("Entity to flip was not a card")
         val newCard = card.copy(isShowingFront = !card.isShowingFront)
 
-        // TODO it could be a different destination! check the location!
-        val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        val destination = BoardDestination(removalResult.locationId, entity.position)
 
         val updatedArea =
             removalResult.newArea.addEntity(destination, newCard) ?: throw IllegalStateException("Board disappeared?!")
@@ -138,8 +134,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val stack = entity.entity as? CardStack ?: throw LogicError("Entity to shuffle was not a stack")
         val shuffled = stack.copy(cards = Deck.shuffle(stack.cards))
 
-        // TODO destination uuid!
-        val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        val destination = BoardDestination(removalResult.locationId, entity.position)
 
         val finalArea =
             removalResult.newArea.addEntity(destination, shuffled) ?: throw IllegalStateException("Board disappeared?!")
@@ -160,8 +155,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val card = cardRemovalResult.entity.entity as? Card ?: throw LogicError("Entity was not a card")
         val updatedStack = stack.copy(cards = listOf(card) + stack.cards)
 
-        // TODO destination uuid!
-        val destination = BoardDestination(area.mainArea.uuid, stackEntity.position)
+        val destination = BoardDestination(stackRemovalResult.locationId, stackEntity.position)
 
         val finalArea =
             areaPrim.addEntity(destination, updatedStack) ?: throw IllegalStateException("Board disappeared?!")

@@ -5,7 +5,6 @@ import com.radeusgd.trachonline.board.BoardArea
 import com.radeusgd.trachonline.board.BoardDestination
 import com.radeusgd.trachonline.board.BoardEntity
 import com.radeusgd.trachonline.board.PlacedEntity
-import com.radeusgd.trachonline.main
 
 /**
  * @param playerId owner's id
@@ -35,6 +34,7 @@ object MainArea : AreaLocationDescription()
 data class RemovalResult(
     val newArea: GameArea,
     val locationDescription: AreaLocationDescription,
+    val locationId: Uuid,
     val entity: PlacedEntity
 )
 
@@ -47,6 +47,7 @@ data class GameArea(val mainArea: BoardArea, val playerAreas: List<PlayerAreas>)
             return RemovalResult(
                 newArea = copy(mainArea = mainResult.first),
                 locationDescription = MainArea,
+                locationId = mainResult.first.uuid,
                 entity = mainResult.second
             )
         } else {
