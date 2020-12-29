@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameSnapshot(val mainArea: BoardArea, val privateArea: BoardArea, val players: List<Player>) {
     companion object Factory {
-        fun empty(): GameSnapshot = GameSnapshot(BoardArea.empty(), BoardArea.empty(), listOf())
+        fun emptyPending(): GameSnapshot = GameSnapshot(BoardArea.empty(), BoardArea.empty(), listOf())
     }
 }

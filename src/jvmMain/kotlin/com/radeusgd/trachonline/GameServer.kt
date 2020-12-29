@@ -29,17 +29,24 @@ data class GameClient(var nickName: String)
 
 class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
 
+    class LogicError(message: String) : RuntimeException(message)
+
     override fun handleMessage(client: Client, message: ClientMessage) {
-        when (message) {
-            is SendChatMessage -> broadcast(ChatMessage(client.nickName(), message.text))
-            is SetNickName -> setNickName(client, message)
-            is MoveEntity -> moveEntity(client, message)
-            is PickStack -> pickStack(client, message)
-            is ShuffleStack -> shuffleStack(client, message)
-            is PutOnStack -> putOnStack(client, message)
-            is FlipCard -> flipCard(client, message)
-            Joined -> playerJoined(client)
-            Exited -> playerExited(client)
+        try {
+            when (message) {
+                is SendChatMessage -> broadcast(ChatMessage(client.nickName(), message.text))
+                is SetNickName -> setNickName(client, message)
+                is MoveEntity -> moveEntity(client, message)
+                is PickStack -> pickStack(client, message)
+                is ShuffleStack -> shuffleStack(client, message)
+                is PutOnStack -> putOnStack(client, message)
+                is FlipCard -> flipCard(client, message)
+                Joined -> playerJoined(client)
+                Exited -> playerExited(client)
+            }
+        } catch (e: RuntimeException) {
+            log("Error: $e")
+            e.printStackTrace()
         }
     }
 
@@ -64,133 +71,102 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
 
     private fun moveEntity(client: Client, message: MoveEntity) {
         val removalResult = area.removeEntity(message.entityUuid)
-        if (removalResult != null) {
-            val destination = message.destination
-            val entity = removalResult.entity
-            val movedArea = removalResult.newArea.addEntity(destination, entity.entity)
-            if (movedArea != null) {
-                area = movedArea
-                val source = renderSourceLocation(removalResult.locationDescription)
-                // TODO better wording of destination too
-                log("${client.nickName()} moves a card from $source to $destination")
-                broadcastGameUpdates()
-            } else {
-                log("Entity was supposed to be moved to $destination which could not be found.")
-            }
-        } else {
-            log("Entity to move, ${message.entityUuid}, could not be found.")
-        }
+            ?: throw LogicError("Entity to move, ${message.entityUuid}, could not be found.")
+        val destination = message.destination
+        val entity = removalResult.entity
+        val movedArea = removalResult.newArea.addEntity(destination, entity.entity)
+            ?: throw LogicError("Entity was supposed to be moved to $destination which could not be found.")
+        area = movedArea
+        val source = renderSourceLocation(removalResult.locationDescription)
+        // TODO better wording of destination too
+        log("${client.nickName()} moves a card from $source to $destination")
+        broadcastGameUpdates()
     }
 
     private fun pickStack(client: Client, message: PickStack) {
         val removalResult = area.removeEntity(message.stackUuid)
-        if (removalResult != null) {
-            val entity = removalResult.entity
-            val stack = entity.entity as? CardStack
-            if (stack != null) {
-                val card = stack.cards.first()
-                val rest = stack.cards.drop(1)
+            ?: throw LogicError("Entity to pick from, ${message.stackUuid}, could not be found.")
+        val entity = removalResult.entity
+        val stack = entity.entity as? CardStack ?: throw LogicError("Entity to pick was not a stack")
+        val card = stack.cards.first()
+        val rest = stack.cards.drop(1)
 
-                // TODO not sure what is the right value for this shift
-                // TODO it could be a different board!
-                val cardDestination = BoardDestination(area.mainArea.uuid, entity.position.move(3f,5f).moveUp())
-                val addedArea = removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
+        // TODO not sure what is the right value for this shift
+        // TODO it could be a different board!
+        val cardDestination = BoardDestination(area.mainArea.uuid, entity.position.move(3f, 5f).moveUp())
+        val addedArea =
+            removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
 
-                val leftOverEntity = if (rest.size == 1) rest.first() else stack.copy(cards = rest)
-                val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        val leftOverEntity = if (rest.size == 1) rest.first() else stack.copy(cards = rest)
+        val destination = BoardDestination(area.mainArea.uuid, entity.position)
 
-                val finalArea = addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
-                area = finalArea
-                log("${client.nickName()} picks a card from a stack")
-                broadcastGameUpdates()
-            } else {
-                log("was not a stack") // TODO
-            }
-        } else {
-            log("Entity to pick from, ${message.stackUuid}, could not be found.")
-        }
+        val finalArea =
+            addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
+        area = finalArea
+        log("${client.nickName()} picks a card from a stack")
+        broadcastGameUpdates()
     }
 
     private fun flipCard(client: Client, message: FlipCard) {
         val removalResult = area.removeEntity(message.cardUuid)
-        if (removalResult != null) {
-            val entity = removalResult.entity
-            val card = entity.entity as? Card
-            if (card != null) {
-                val newCard = card.copy(isShowingFront = !card.isShowingFront)
+            ?: throw LogicError("Entity to flip, ${message.cardUuid}, could not be found.")
+        val entity = removalResult.entity
+        val card = entity.entity as? Card ?: throw LogicError("Entity to flip was not a card")
+        val newCard = card.copy(isShowingFront = !card.isShowingFront)
 
-                // TODO it could be a different destination! check the location!
-                val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        // TODO it could be a different destination! check the location!
+        val destination = BoardDestination(area.mainArea.uuid, entity.position)
 
-                val updatedArea = removalResult.newArea.addEntity(destination, newCard) ?: throw IllegalStateException("Board disappeared?!")
+        val updatedArea =
+            removalResult.newArea.addEntity(destination, newCard) ?: throw IllegalStateException("Board disappeared?!")
 
-                area = updatedArea
-                log("${client.nickName()} flips a card")
-                broadcastGameUpdates()
-            } else {
-                log("was not a card") // TODO
-            }
-        } else {
-            log("Entity to flip, ${message.cardUuid}, could not be found.")
-        }
+        area = updatedArea
+        log("${client.nickName()} flips a card")
+        broadcastGameUpdates()
     }
 
     private fun shuffleStack(client: Client, message: ShuffleStack) {
         val removalResult = area.removeEntity(message.stackUuid)
-        if (removalResult != null) {
-            val entity = removalResult.entity
-            val stack = entity.entity as? CardStack
-            if (stack != null) {
-                val shuffled = stack.copy(cards = Deck.shuffle(stack.cards))
+            ?: throw LogicError("Entity to shuffle, ${message.stackUuid}, could not be found.")
+        val entity = removalResult.entity
+        val stack = entity.entity as? CardStack ?: throw LogicError("Entity to shuffle was not a stack")
+        val shuffled = stack.copy(cards = Deck.shuffle(stack.cards))
 
-                // TODO destination uuid!
-                val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        // TODO destination uuid!
+        val destination = BoardDestination(area.mainArea.uuid, entity.position)
 
-                val finalArea = removalResult.newArea.addEntity(destination, shuffled) ?: throw IllegalStateException("Board disappeared?!")
-                area = finalArea
-                log("${client.nickName()} shuffles a stack")
-                broadcastGameUpdates()
-            } else {
-                log("was not a stack") // TODO
-            }
-        } else {
-            log("Entity to shuffle, ${message.stackUuid}, could not be found.")
-        }
+        val finalArea =
+            removalResult.newArea.addEntity(destination, shuffled) ?: throw IllegalStateException("Board disappeared?!")
+        area = finalArea
+        log("${client.nickName()} shuffles a stack")
+        broadcastGameUpdates()
     }
 
     private fun putOnStack(client: Client, message: PutOnStack) {
         val stackRemovalResult = area.removeEntity(message.stackUuid)
-        if (stackRemovalResult != null) {
-            val cardRemovalResult = stackRemovalResult.newArea.removeEntity(message.cardUuid)
-            if (cardRemovalResult != null) {
-                val areaPrim = cardRemovalResult.newArea
-                val stackEntity = stackRemovalResult.entity
-                val stack = stackEntity.entity as? CardStack
-                val card = cardRemovalResult.entity.entity as? Card
-                if (stack != null && card != null) {
-                    val updatedStack = stack.copy(cards = listOf(card) + stack.cards)
+            ?: throw LogicError("Stack to put on, ${message.stackUuid}, could not be found.")
+        val cardRemovalResult = stackRemovalResult.newArea.removeEntity(message.cardUuid)
+            ?: throw LogicError("Card to put on a stack, ${message.cardUuid}, could not be found")
+        val areaPrim = cardRemovalResult.newArea
+        val stackEntity = stackRemovalResult.entity
+        val stack = stackEntity.entity as? CardStack ?: throw LogicError("Entity was not a stack")
+        val card = cardRemovalResult.entity.entity as? Card ?: throw LogicError("Entity was not a card")
+        val updatedStack = stack.copy(cards = listOf(card) + stack.cards)
 
-                    // TODO destination uuid!
-                    val destination = BoardDestination(area.mainArea.uuid, stackEntity.position)
+        // TODO destination uuid!
+        val destination = BoardDestination(area.mainArea.uuid, stackEntity.position)
 
-                    val finalArea = areaPrim.addEntity(destination, updatedStack) ?: throw IllegalStateException("Board disappeared?!")
-                    area = finalArea
-                    log("${client.nickName()} places a card into a stack")
-                    broadcastGameUpdates()
-                } else {
-                    log("Can only put a CARD on STACK")
-                }
-            } else {
-                log("Card to put, ${message.cardUuid}, could not be found")
-            }
-        } else {
-            log("Stack to put on, ${message.stackUuid}, could not be found.")
-        }
+        val finalArea =
+            areaPrim.addEntity(destination, updatedStack) ?: throw IllegalStateException("Board disappeared?!")
+        area = finalArea
+        log("${client.nickName()} places a card into a stack")
+        broadcastGameUpdates()
     }
 
 
     // TODO prettier wording here
-    private fun renderSourceLocation(areaLocationDescription: AreaLocationDescription): String = areaLocationDescription.toString()
+    private fun renderSourceLocation(areaLocationDescription: AreaLocationDescription): String =
+        areaLocationDescription.toString()
 
     private fun broadcastGameUpdates() {
         connectedClients().forEach {

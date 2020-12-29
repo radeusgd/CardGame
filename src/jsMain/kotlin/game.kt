@@ -4,7 +4,6 @@ import com.radeusgd.trachonline.messages.Error
 import com.radeusgd.trachonline.messages.LogMessage
 import com.radeusgd.trachonline.messages.ServerMessage
 import com.radeusgd.trachonline.messages.UpdateGameState
-import kotlinx.css.script
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.MessageEvent
@@ -28,7 +27,7 @@ data class ViewState(
 class Game(props: ViewProps) : RComponent<ViewProps, ViewState>(props) {
 
     init {
-        state = ViewState(messages = listOf(), gameSnapshot = GameSnapshot.empty())
+        state = ViewState(messages = listOf(), gameSnapshot = GameSnapshot.emptyPending())
         socket.onmessage = { event: MessageEvent ->
             val data = event.data
             if (data is String) {

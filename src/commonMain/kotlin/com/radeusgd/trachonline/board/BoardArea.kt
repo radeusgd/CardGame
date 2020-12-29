@@ -20,13 +20,9 @@ data class BoardArea(
     fun add(entity: PlacedEntity): BoardArea = add(listOf(entity))
 
     fun remove(entityId: Uuid): Pair<BoardArea, PlacedEntity>? {
-        val found = entities.find { it.entity.uuid == entityId }
-        if (found != null) {
-            val withoutFound = entities.filter { it.entity.uuid != entityId }
-            return Pair(copy(entities = withoutFound), found)
-        } else {
-            return null
-        }
+        val found = entities.find { it.entity.uuid == entityId } ?: return null
+        val withoutFound = entities.filter { it.entity.uuid != entityId }
+        return Pair(copy(entities = withoutFound), found)
     }
 
     /** Counts all cards contained within this area, including ones inside of stacks. */
