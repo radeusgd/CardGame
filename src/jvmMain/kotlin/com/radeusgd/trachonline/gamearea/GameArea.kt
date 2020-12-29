@@ -14,22 +14,24 @@ import com.radeusgd.trachonline.board.PlacedEntity
 data class PlayerAreas(val playerId: Uuid, val privateArea: BoardArea, val personalArea: BoardArea) {
     companion object {
         fun empty(playerId: Uuid): PlayerAreas {
-            // TODO remove
-//            val mockedPrivCard =
-//                PlacedEntity(Card(uuid4(), CardVisuals("trach-cards/atak.jpg", "back.jpg"), true), Position(3f, 1f, 0))
-//            val mockedPersCard =
-//                PlacedEntity(Card(uuid4(), CardVisuals("trach-cards/obrona.jpg", "back.jpg"), true), Position(1f, 1f, 0))
-//            return PlayerAreas(playerId, BoardArea.empty().add(mockedPrivCard), BoardArea.empty().add(mockedPersCard))
             return PlayerAreas(playerId, BoardArea.empty(), BoardArea.empty())
         }
     }
 }
 
-sealed class AreaLocationDescription
+sealed class AreaLocationDescription {
+    abstract val public: Boolean
+}
 
-data class PrivateArea(val playerId: Uuid) : AreaLocationDescription()
-data class PersonalArea(val playerId: Uuid) : AreaLocationDescription()
-object MainArea : AreaLocationDescription()
+data class PrivateArea(val playerId: Uuid) : AreaLocationDescription() {
+    override val public = false
+}
+data class PersonalArea(val playerId: Uuid) : AreaLocationDescription() {
+    override val public = true
+}
+object MainArea : AreaLocationDescription() {
+    override val public = true
+}
 
 data class RemovalResult(
     val newArea: GameArea,
@@ -41,19 +43,47 @@ data class RemovalResult(
 data class GameArea(val mainArea: BoardArea, val playerAreas: List<PlayerAreas>) {
     fun addPlayer(playerId: Uuid): GameArea = copy(playerAreas = playerAreas + PlayerAreas.empty(playerId))
 
-    fun removeEntity(entityId: Uuid): RemovalResult? {
-        val mainResult = mainArea.remove(entityId)
-        if (mainResult != null) {
-            return RemovalResult(
-                newArea = copy(mainArea = mainResult.first),
-                locationDescription = MainArea,
-                locationId = mainResult.first.uuid,
-                entity = mainResult.second
-            )
-        } else {
-            // TODO check also players
-            return null
+    private data class BoardLens(
+        val board: BoardArea,
+        val locationDescription: AreaLocationDescription,
+        val updateItself: (BoardArea) -> GameArea
+    )
+
+    private fun modifyPlayer(playerId: Uuid, newValue: PlayerAreas): GameArea {
+        val otherPlayers = playerAreas.filter { it.playerId != playerId }
+        return copy(playerAreas = otherPlayers + newValue)
+    }
+
+    private fun allBoards(): List<BoardLens> {
+        val mainAreaLens = BoardLens(mainArea, MainArea) { mod -> copy(mainArea = mod) }
+        val playerLenses = playerAreas.flatMap { player ->
+            val privateLens = BoardLens(player.privateArea, PrivateArea(player.playerId)) { mod ->
+                modifyPlayer(player.playerId, player.copy(privateArea = mod))
+            }
+            val publicLens = BoardLens(player.personalArea, PersonalArea(player.playerId)) { mod ->
+                modifyPlayer(player.playerId, player.copy(personalArea = mod))
+            }
+
+            listOf(privateLens, publicLens)
         }
+        return listOf(mainAreaLens) + playerLenses
+    }
+
+    fun removeEntity(entityId: Uuid): RemovalResult? {
+        allBoards().forEach { boardLens ->
+            val updated = boardLens.board.remove(entityId)
+            if (updated != null) {
+                val (newBoard, entity) = updated
+                return RemovalResult(
+                    newArea = boardLens.updateItself(newBoard),
+                    locationDescription = boardLens.locationDescription,
+                    locationId = boardLens.board.uuid,
+                    entity = entity
+                )
+            }
+        }
+
+        return null
     }
 
     /** Adds an entity to the specific part of game area.
@@ -62,22 +92,17 @@ data class GameArea(val mainArea: BoardArea, val playerAreas: List<PlayerAreas>)
      */
     fun addEntity(destination: BoardDestination, entity: BoardEntity): GameArea? {
         val placed = PlacedEntity(entity, destination.position)
-        if (mainArea.uuid == destination.boardId) {
-            return copy(mainArea = mainArea.add(placed))
-        } else {
-            // TODO player areas
-            return null
+        allBoards().forEach { boardLens ->
+            if (boardLens.board.uuid == destination.boardId) {
+                val newBoard = boardLens.board.add(placed)
+                return boardLens.updateItself(newBoard)
+            }
         }
+        return null
     }
 
     fun describeBoard(uuid: Uuid): AreaLocationDescription? {
-        if (uuid == mainArea.uuid) {
-            return MainArea
-        }
-        playerAreas.forEach { player ->
-            if (uuid == player.personalArea.uuid) return PersonalArea(player.playerId)
-            if (uuid == player.privateArea.uuid) return PrivateArea(player.playerId)
-        }
-        return null
+        val boardLens = allBoards().find { it.board.uuid == uuid }
+        return boardLens?.locationDescription
     }
 }

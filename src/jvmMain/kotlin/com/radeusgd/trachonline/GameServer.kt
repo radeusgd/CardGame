@@ -81,9 +81,12 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             ?: throw LogicError("Entity was supposed to be moved to $destination which could not be found.")
         area = movedArea
         broadcastGameUpdates()
-        val source = renderLocation(removalResult.locationDescription)
-        val renderedDestination = area.describeBoard(destination.boardId)?.let { renderLocation(it) } ?: "Unknown board"
-        log("${client.nickName()} moves a card from $source to $renderedDestination")
+        val destinationDescription = area.describeBoard(destination.boardId)
+        if (removalResult.locationDescription.public || destinationDescription?.public != false) {
+            val source = renderLocation(removalResult.locationDescription)
+            val renderedDestination = destinationDescription?.let { renderLocation(it) } ?: "Unknown board"
+            log("${client.nickName()} moves a card from $source to $renderedDestination")
+        }
     }
 
     private fun pickStack(client: Client, message: PickStack) {
@@ -99,14 +102,16 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
 
         val leftOverEntity = if (rest.size == 1) rest.first() else stack.copy(cards = rest)
-        val destination = BoardDestination(area.mainArea.uuid, entity.position)
+        val destination = BoardDestination(removalResult.locationId, entity.position)
 
         val finalArea =
             addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
         broadcastGameUpdates()
-        val location = renderLocation(removalResult.locationDescription)
-        log("${client.nickName()} picks a card from a stack in $location")
+        if (removalResult.locationDescription.public) {
+            val location = renderLocation(removalResult.locationDescription)
+            log("${client.nickName()} picks a card from a stack in $location")
+        }
     }
 
     private fun flipCard(client: Client, message: FlipCard) {
@@ -123,8 +128,10 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
 
         area = updatedArea
         broadcastGameUpdates()
-        val location = renderLocation(removalResult.locationDescription)
-        log("${client.nickName()} flips a card in $location")
+        if (removalResult.locationDescription.public) {
+            val location = renderLocation(removalResult.locationDescription)
+            log("${client.nickName()} flips a card in $location")
+        }
     }
 
     private fun shuffleStack(client: Client, message: ShuffleStack) {
@@ -140,8 +147,10 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             removalResult.newArea.addEntity(destination, shuffled) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
         broadcastGameUpdates()
-        val location = renderLocation(removalResult.locationDescription)
-        log("${client.nickName()} shuffles a stack in $location")
+        if (removalResult.locationDescription.public) {
+            val location = renderLocation(removalResult.locationDescription)
+            log("${client.nickName()} shuffles a stack in $location")
+        }
     }
 
     private fun putOnStack(client: Client, message: PutOnStack) {
@@ -161,9 +170,11 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             areaPrim.addEntity(destination, updatedStack) ?: throw IllegalStateException("Board disappeared?!")
         area = finalArea
         broadcastGameUpdates()
-        val stackLocation = renderLocation(stackRemovalResult.locationDescription)
-        val cardLocation = renderLocation(cardRemovalResult.locationDescription)
-        log("${client.nickName()} places a card from $cardLocation onto a stack in $stackLocation")
+        if (stackRemovalResult.locationDescription.public || cardRemovalResult.locationDescription.public) {
+            val stackLocation = renderLocation(stackRemovalResult.locationDescription)
+            val cardLocation = renderLocation(cardRemovalResult.locationDescription)
+            log("${client.nickName()} places a card from $cardLocation onto a stack in $stackLocation")
+        }
     }
 
     private fun renderLocation(areaLocationDescription: AreaLocationDescription): String =

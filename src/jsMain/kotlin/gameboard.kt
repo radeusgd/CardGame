@@ -65,7 +65,7 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
             child(BoardAreaView::class) {
                 attrs {
                     board = props.gameSnapshot.privateArea
-                    entityBaseSize = 10f
+                    entityBaseSize = 7f
                     name = "Karty na ręce"
                     background = Color("#938521")
                 }
