@@ -26,9 +26,11 @@ sealed class AreaLocationDescription {
 data class PrivateArea(val playerId: Uuid) : AreaLocationDescription() {
     override val public = false
 }
+
 data class PersonalArea(val playerId: Uuid) : AreaLocationDescription() {
     override val public = true
 }
+
 object MainArea : AreaLocationDescription() {
     override val public = true
 }

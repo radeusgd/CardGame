@@ -25,6 +25,8 @@ import kotlinx.css.opacity
 import kotlinx.css.overflowX
 import kotlinx.css.overflowY
 import kotlinx.css.padding
+import kotlinx.css.paddingLeft
+import kotlinx.css.paddingTop
 import kotlinx.css.pct
 import kotlinx.css.position
 import kotlinx.css.px

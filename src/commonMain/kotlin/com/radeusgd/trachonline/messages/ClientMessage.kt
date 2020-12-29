@@ -48,6 +48,12 @@ data class FlipCard(
 ) : ClientMessage()
 
 @Serializable
+data class MakeStack(
+    @Serializable(with = UuidSerializer::class)
+    val cardUuid: Uuid
+) : ClientMessage()
+
+@Serializable
 object Joined : ClientMessage()
 
 @Serializable

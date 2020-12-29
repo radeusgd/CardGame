@@ -28,6 +28,7 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
                     entityBaseSize = 5f
                     name = "Główna plansza"
                     background = GameStyles.boardAreaColor
+                    includeStackMaker = true
                 }
             }
         }
@@ -52,6 +53,7 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
                             entityBaseSize = playerPersonalAreaScale
                             name = null
                             background = GameStyles.boardAreaColor
+                            includeStackMaker = false
                         }
                     }
                 }
@@ -68,6 +70,7 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
                     entityBaseSize = 7f
                     name = "Karty na ręce"
                     background = Color("#938521")
+                    includeStackMaker = false
                 }
             }
         }
@@ -75,5 +78,6 @@ class Gameboard(props: GameboardProps) : RComponent<GameboardProps, GameboardSta
 
     companion object {
         val BoardAreaClass = "board-area"
+        val StackMakerClass = "stack-maker"
     }
 }

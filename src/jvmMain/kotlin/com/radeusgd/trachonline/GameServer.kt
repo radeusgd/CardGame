@@ -19,6 +19,7 @@ import com.radeusgd.trachonline.messages.Exited
 import com.radeusgd.trachonline.messages.FlipCard
 import com.radeusgd.trachonline.messages.Joined
 import com.radeusgd.trachonline.messages.LogMessage
+import com.radeusgd.trachonline.messages.MakeStack
 import com.radeusgd.trachonline.messages.MoveEntity
 import com.radeusgd.trachonline.messages.PickStack
 import com.radeusgd.trachonline.messages.PutOnStack
@@ -44,6 +45,7 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
                 is ShuffleStack -> shuffleStack(client, message)
                 is PutOnStack -> putOnStack(client, message)
                 is FlipCard -> flipCard(client, message)
+                is MakeStack -> makeStack(client, message)
                 Joined -> playerJoined(client)
                 Exited -> playerExited(client)
             }
@@ -101,12 +103,14 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
         val addedArea =
             removalResult.newArea.addEntity(cardDestination, card) ?: throw IllegalStateException("Board disappeared?!")
 
-        val leftOverEntity = if (rest.size == 1) rest.first() else stack.copy(cards = rest)
+        val leftOverEntity =
+            if (rest.isEmpty()) null else if (rest.size == 1) rest.first() else stack.copy(cards = rest)
         val destination = BoardDestination(removalResult.locationId, entity.position)
 
-        val finalArea =
-            addedArea.addEntity(destination, leftOverEntity) ?: throw IllegalStateException("Board disappeared?!")
-        area = finalArea
+        val finalArea = leftOverEntity?.let {
+            addedArea.addEntity(destination, it) ?: throw IllegalStateException("Board disappeared?!")
+        }
+        area = finalArea ?: addedArea
         broadcastGameUpdates()
         if (removalResult.locationDescription.public) {
             val location = renderLocation(removalResult.locationDescription)
@@ -175,6 +179,21 @@ class GameServer(gameDefinition: GameDefinition) : Server<Unit>() {
             val cardLocation = renderLocation(cardRemovalResult.locationDescription)
             log("${client.nickName()} places a card from $cardLocation onto a stack in $stackLocation")
         }
+    }
+
+    private fun makeStack(client: Client, message: MakeStack) {
+        val removalResult = area.removeEntity(message.cardUuid)
+            ?: throw LogicError("Card to put on a new stack, ${message.cardUuid}, could not be found")
+        val areaPrim = removalResult.newArea
+        val card = removalResult.entity.entity as? Card ?: throw LogicError("Entity was not a card")
+        val stack = CardStack.make(listOf(card))
+
+        val destination = BoardDestination(removalResult.locationId, removalResult.entity.position)
+
+        val finalArea =
+            areaPrim.addEntity(destination, stack) ?: throw IllegalStateException("Board disappeared?!")
+        area = finalArea
+        broadcastGameUpdates()
     }
 
     private fun renderLocation(areaLocationDescription: AreaLocationDescription): String =

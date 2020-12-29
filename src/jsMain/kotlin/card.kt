@@ -6,6 +6,7 @@ import com.radeusgd.trachonline.board.CardStack
 import com.radeusgd.trachonline.board.PlacedEntity
 import com.radeusgd.trachonline.board.Position
 import com.radeusgd.trachonline.messages.FlipCard
+import com.radeusgd.trachonline.messages.MakeStack
 import com.radeusgd.trachonline.messages.MoveEntity
 import com.radeusgd.trachonline.messages.PickStack
 import com.radeusgd.trachonline.messages.PutOnStack
@@ -24,6 +25,7 @@ import kotlinx.html.js.onDragEnterFunction
 import kotlinx.html.js.onDragLeaveFunction
 import kotlinx.html.js.onDragStartFunction
 import org.w3c.dom.DragEvent
+import org.w3c.dom.Element
 import org.w3c.dom.Image
 import org.w3c.dom.get
 import react.RBuilder
@@ -67,30 +69,31 @@ class EntityView(props: EntityProps) : RComponent<EntityProps, EntityState>(prop
                     dragged?.let {
                         var hasBeenProcessed = false
                         val elementsBelow = document.elementsFromPoint(it.pageX, it.pageY)
-                        val possibleStack = elementsBelow.find { it.hasClass(StackDragTargetClassName) }
-                        val possibleBoard = elementsBelow.find { it.hasClass(Gameboard.BoardAreaClass) }
-                        console.log("Possible stack: $possibleStack")
-                        console.log("Possible board: $possibleBoard")
+                        fun findByClass(className: String): Element? {
+                            return elementsBelow.find { it.hasClass(className) }
+                        }
 
-                        if (entity is Card) {
-                            possibleStack?.attributes?.get("data-stackid")?.value?.let {
+                        val possibleStack = findByClass(StackDragTargetClassName)
+                        val possibleStackMaker = findByClass(Gameboard.StackMakerClass)
+                        val possibleBoard = findByClass(Gameboard.BoardAreaClass)
+
+                        if (entity is Card && possibleStack != null) {
+                            possibleStack.attributes["data-stackid"]?.value?.let {
                                 console.log("Stack $it")
                                 val uuid: Uuid = uuidFrom(it)
                                 sendMessage(PutOnStack(stackUuid = uuid, cardUuid = entity.uuid))
                                 hasBeenProcessed = true
                             }
-                        }
-
-                        if (hasBeenProcessed) return@let
-
-                        possibleBoard?.let { board ->
-                            board.attributes?.get("data-boardid")?.value?.let { boardId ->
-                                val rect = board.getBoundingClientRect()
+                        } else if (entity is Card && possibleStackMaker != null) {
+                            sendMessage(MakeStack(cardUuid = entity.uuid))
+                        } else if (possibleBoard != null) {
+                            possibleBoard.attributes["data-boardid"]?.value?.let { boardId ->
+                                val rect = possibleBoard.getBoundingClientRect()
                                 console.log("Board $boardId")
 
                                 val vw = max(document.documentElement?.clientWidth ?: 0, window.innerWidth)
                                 val vh = max(document.documentElement?.clientHeight ?: 0, window.innerHeight)
-                                val vmin = if  (vw == 0) vh else if (vh == 0) vw else min(vw, vh)
+                                val vmin = if (vw == 0) vh else if (vh == 0) vw else min(vw, vh)
                                 if (vmin == 0) {
                                     console.error("Could not estimate viewport size!")
                                 } else {
@@ -102,9 +105,7 @@ class EntityView(props: EntityProps) : RComponent<EntityProps, EntityState>(prop
                                     sendMessage(MoveEntity(entity.uuid, destination))
                                 }
                             }
-                        }
-
-                        if (!hasBeenProcessed) {
+                        } else {
                             console.log("No board nor stack target found")
                         }
                     }
