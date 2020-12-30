@@ -64,7 +64,7 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
 //        bottom = 1.pct
 //        right = 1.pct
         width = 42.pct
-        height = 35.pct
+        height = 20.pct
 
         boxSizing = BoxSizing.borderBox
         overflowY = Overflow.scroll
@@ -95,7 +95,7 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
 //        top = 1.pct
 //        right = 1.pct
         float = kotlinx.css.Float.right
-        height = 55.pct
+        height = 79.pct
         width = 42.pct
 
         boxSizing = BoxSizing.borderBox
