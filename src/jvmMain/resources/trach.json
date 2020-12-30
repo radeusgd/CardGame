@@ -5,36 +5,86 @@
       "basePath": "trach-cards",
       "backName": "rewersy-05.png",
       "cards": [
+        // podstawka 65
         {
           "name": "atak.jpg",
-          "count": 7
+          "count": 15
+        },
+        {
+          "name": "atomowy_guzik.jpg",
+          "count": 1
+        },
+        {
+          "name": "atomowy_guzik-2.jpg",
+          "count": 1
         },
         {
           "name": "obrona.jpg",
           "count": 5
         },
         {
-          "name": "wzmocnienie.jpg",
-          "count": 3
+          "name": "odbicie.jpg",
+          "count": 5
         },
         {
-          "name": "odbicie.jpg",
-          "count": 3
+          "name": "globalizacja.jpg",
+          "count": 1
+        },
+        {
+          "name": "globalizacja-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "przebicie.jpg",
+          "count": 5
         },
         {
           "name": "przerzut.jpg",
-          "count": 3
-        },
-        {
-          "name": "plecak.jpg",
-          "count": 1
+          "count": 5
         },
         {
           "name": "pustak.jpg",
           "count": 5
         },
         {
-          "name": "piorun.jpg",
+          "name": "schron.jpg",
+          "count": 1
+        },
+        {
+          "name": "schron-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "schron-3.jpg",
+          "count": 1
+        },
+        {
+          "name": "schron-4.jpg",
+          "count": 1
+        },
+        {
+          "name": "schron-5.jpg",
+          "count": 1
+        },
+        {
+          "name": "uzdrowienie.jpg",
+          "count": 5
+        },
+        {
+          "name": "wskrzeszenie.jpg",
+          "count": 1
+        },
+        {
+          "name": "zamrozenie.jpg",
+          "count": 5
+        },
+        {
+          "name": "zmasowany_atak.jpg",
+          "count": 5
+        },
+        // potega 15
+        {
+          "name": "pelna_regeneracja.jpg",
           "count": 1
         },
         {
@@ -44,6 +94,290 @@
         {
           "name": "podniesienie_priorytetu-2.jpg",
           "count": 1
+        },
+        {
+          "name": "podwojenie.jpg",
+          "count": 2
+        },
+        {
+          "name": "potezne_uzdrowienie.jpg",
+          "count": 2
+        },
+        {
+          "name": "potezny_atak.jpg",
+          "count": 2
+        },
+        {
+          "name": "trucizna.jpg",
+          "count": 2
+        },
+        {
+          "name": "ujawnienie.jpg",
+          "count": 1
+        },
+        {
+          "name": "wzmocnienie.jpg",
+          "count": 3
+        },
+        // armagedon 18
+        {
+          "name": "apokalipsa.jpg",
+          "count": 1
+        },
+        {
+          "name": "blogoslawienstwo.jpg",
+          "count": 1
+        },
+        {
+          "name": "blogoslawienstwo-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "blogoslawienstwo-3.jpg",
+          "count": 1
+        },
+        {
+          "name": "blogoslawienstwo-4.jpg",
+          "count": 1
+        },
+        {
+          "name": "blogoslawienstwo-5.jpg",
+          "count": 1
+        },
+        {
+          "name": "chwila_smierci.jpg",
+          "count": 1
+        },
+        {
+          "name": "eliminacja_karty.jpg",
+          "count": 1
+        },
+        {
+          "name": "eliminacja_karty-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "klatwa.jpg",
+          "count": 1
+        },
+        {
+          "name": "klatwa-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "nietykalny.jpg",
+          "count": 1
+        },
+        {
+          "name": "nietykalny-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "piorun.jpg",
+          "count": 1
+        },
+        {
+          "name": "posazek.jpg",
+          "count": 1
+        },
+        {
+          "name": "szczepionka.jpg",
+          "count": 1
+        },
+        {
+          "name": "szczepionka-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "zaraza.jpg",
+          "count": 1
+        },
+        // mix 16
+        {
+          "name": "ambulans.jpg",
+          "count": 1
+        },
+        {
+          "name": "kontratak.jpg",
+          "count": 2
+        },
+        {
+          "name": "kot.jpg",
+          "count": 1
+        },
+        {
+          "name": "lustrzane_odbicie.jpg",
+          "count": 1
+        },
+        {
+          "name": "odwrocenie_czasu.jpg",
+          "count": 1
+        },
+        {
+          "name": "pancerz.jpg",
+          "count": 2
+        },
+        {
+          "name": "podwojna_kolejka.jpg",
+          "count": 2
+        },
+        {
+          "name": "rozdwojenie_jazni.jpg",
+          "count": 1
+        },
+        {
+          "name": "skrzynka.jpg",
+          "count": 1
+        },
+        {
+          "name": "strzal_w_plecy.jpg",
+          "count": 2
+        },
+        {
+          "name": "super_trach.jpg",
+          "count": 1
+        },
+        {
+          "name": "wyrownanie_szans.jpg",
+          "count": 1
+        }
+        // raczki 16
+        {
+          "name": "dezaktywacja_karty.jpg",
+          "count": 1
+        },
+        {
+          "name": "dezaktywacja_karty-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "kradziez_karty.jpg",
+          "count": 1
+        },
+        {
+          "name": "kradziez_karty-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "mala_lapka.jpg",
+          "count": 1
+        },
+        {
+          "name": "plecak.jpg",
+          "count": 1
+        },
+        {
+          "name": "recykling.jpg",
+          "count": 1
+        },
+        {
+          "name": "recykling-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "rzut.jpg",
+          "count": 1
+        },
+        {
+          "name": "rzut-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "szpieg.jpg",
+          "count": 1
+        },
+        {
+          "name": "szpieg-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "targowisko.jpg",
+          "count": 1
+        },
+        {
+          "name": "wielka_lapa.jpg",
+          "count": 1
+        },
+        {
+          "name": "wymiana_kart.jpg",
+          "count": 1
+        },
+        {
+          "name": "zamiana.jpg",
+          "count": 1
+        },
+        // cechy 18
+        {
+          "name": "berserk.jpg",
+          "count": 1
+        },
+        {
+          "name": "emanacja.jpg",
+          "count": 1
+        },
+        {
+          "name": "gruboskorny.jpg",
+          "count": 1
+        },
+        {
+          "name": "krotkie_raczki.jpg",
+          "count": 1
+        },
+        {
+          "name": "nadrwazliwy.jpg",
+          "count": 1
+        },
+        {
+          "name": "nasladowca.jpg",
+          "count": 1
+        },
+        {
+          "name": "nieuleczalnie_chory.jpg",
+          "count": 1
+        },
+        {
+          "name": "nowonarodzony.jpg",
+          "count": 1
+        },
+        {
+          "name": "oslabienie.jpg",
+          "count": 1
+        },
+        {
+          "name": "regenerujacy_sie.jpg",
+          "count": 1
+        },
+        {
+          "name": "superwytrzymaly.jpg",
+          "count": 1
+        },
+        {
+          "name": "trening.jpg",
+          "count": 1
+        },
+        {
+          "name": "trening-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "utrata_cechy.jpg",
+          "count": 1
+        },
+        {
+          "name": "utrata_cechy-2.jpg",
+          "count": 1
+        },
+        {
+          "name": "utrata_cechy-3.jpg",
+          "count": 1
+        },
+        {
+          "name": "wampir.jpg",
+          "count": 1
+        },
+        {
+          "name": "wielce_zywotny.jpg",
+          "count": 3
         }
       ]
     },
