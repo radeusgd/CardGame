@@ -19,14 +19,10 @@ import kotlinx.css.height
 import kotlinx.css.left
 import kotlinx.css.margin
 import kotlinx.css.maxWidth
-import kotlinx.css.minHeight
-import kotlinx.css.minWidth
 import kotlinx.css.opacity
 import kotlinx.css.overflowX
 import kotlinx.css.overflowY
 import kotlinx.css.padding
-import kotlinx.css.paddingLeft
-import kotlinx.css.paddingTop
 import kotlinx.css.pct
 import kotlinx.css.position
 import kotlinx.css.px
@@ -57,7 +53,6 @@ object GameStyles : StyleSheet("GameStyles", isStatic = true) {
         bottom = 1.pct
         height = LinearDimension.auto
     }
-
 
     val chatContainer by css {
         padding(5.px)

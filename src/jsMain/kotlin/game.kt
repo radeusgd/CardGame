@@ -4,17 +4,16 @@ import com.radeusgd.trachonline.messages.Error
 import com.radeusgd.trachonline.messages.LogMessage
 import com.radeusgd.trachonline.messages.ServerMessage
 import com.radeusgd.trachonline.messages.UpdateGameState
+import kotlinx.browser.document
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.w3c.dom.MessageEvent
 import react.RBuilder
 import react.RComponent
 import react.RProps
-import kotlinx.browser.document
 import react.RState
 import styled.css
 import styled.styledDiv
-
 
 external interface ViewProps : RProps
 
@@ -57,9 +56,9 @@ class Game(props: ViewProps) : RComponent<ViewProps, ViewState>(props) {
         scrollChatToBottom()
     }
 
-    private fun scrollChatToBottom() : Unit = document.getElementById(CHAT_ELEMENT_ID)?.run {
+    private fun scrollChatToBottom(): Unit = document.getElementById(CHAT_ELEMENT_ID)?.run {
         scrollIntoView(false)
-    }?: console.error("Failed to scroll")
+    } ?: console.error("Failed to scroll")
 
     override fun RBuilder.render() {
         styledDiv {

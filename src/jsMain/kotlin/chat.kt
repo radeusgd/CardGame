@@ -2,7 +2,6 @@ import Game.Companion.CHAT_ELEMENT_ID
 import com.radeusgd.trachonline.messages.SendChatMessage
 import com.radeusgd.trachonline.messages.SetNickName
 import kotlinx.browser.window
-import kotlinx.html.DIV
 import kotlinx.html.InputType
 import kotlinx.html.id
 import kotlinx.html.js.onChangeFunction

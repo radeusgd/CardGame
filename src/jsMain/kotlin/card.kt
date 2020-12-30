@@ -11,8 +11,6 @@ import com.radeusgd.trachonline.messages.MoveEntity
 import com.radeusgd.trachonline.messages.PickStack
 import com.radeusgd.trachonline.messages.PutOnStack
 import com.radeusgd.trachonline.messages.ShuffleStack
-import kotlin.math.max
-import kotlin.math.min
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.dom.hasClass
@@ -38,6 +36,8 @@ import styled.css
 import styled.styledA
 import styled.styledDiv
 import styled.styledImg
+import kotlin.math.max
+import kotlin.math.min
 
 // TODO parent board id may be obsolete if we are able to detect boards by position, but we still need some notion of what boards are available
 data class EntityProps(var placedEntity: PlacedEntity, var baseSize: Float, var parentBoardId: Uuid) : RProps

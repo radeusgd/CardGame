@@ -25,7 +25,6 @@ import io.ktor.sessions.sessions
 import io.ktor.sessions.set
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
-import java.util.UUID
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.html.HTML
@@ -39,6 +38,7 @@ import kotlinx.html.unsafe
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.util.UUID
 
 fun index(): (HTML.() -> Unit) {
     return {
