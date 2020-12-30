@@ -56,7 +56,7 @@ data class GameDefinition(val name: String, val decks: List<Deck>) {
         fun parse(json: String): GameDefinition = Json.decodeFromString(json)
         fun loadResource(name: String): GameDefinition? {
             val text = this::class.java.classLoader.getResource(name)?.readText()
-                ?.lines()?.filter { l -> l.trim().startsWith("//") }?.joinToString()
+                ?.lines()?.filter { !it.trimStart().startsWith("//") }?.joinToString("\n")
             return text?.let { parse(it) }
         }
     }
