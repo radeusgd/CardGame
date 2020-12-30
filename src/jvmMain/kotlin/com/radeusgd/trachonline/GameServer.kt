@@ -108,7 +108,7 @@ class GameServer(val gameDefinitions: List<GameDefinition>) : Server<Unit>() {
                     personalArea = areas.personalArea,
                     privateAreaCount = areas.privateArea.countCards()
                 )
-            }
+            }.sortedBy { it.name }
         )
     }
 
